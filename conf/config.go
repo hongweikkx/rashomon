@@ -12,9 +12,22 @@ type GrpcServerConf struct {
 	Addr string
 }
 
+type HystrixModelConf struct {
+	Timeout int
+	MaxConcurrentRequests int
+	RequestVolumeThreshold int
+	ErrorPercentThreshold int
+}
+
+type HystrixConf struct {
+	Degrade HystrixModelConf
+	Fuse HystrixModelConf
+}
+
 type Config struct {
 	HttpServer HttpServerConf `yaml:"httpServer"`
 	GrpcServer GrpcServerConf `yaml:"grpcServer"`
+	Hystrix HystrixConf `yaml:"Hystrix"`
 }
 
 var AppConfig Config

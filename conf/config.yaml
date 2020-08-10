@@ -2,3 +2,16 @@ HttpServer:
   Addr: ":8080"
 GrpcServer:
   Addr: ":8081"
+Hystrix:
+  degrade:
+    Timeout: 1000
+    MaxConcurrentRequests: 100
+    RequestVolumeThreshold: 10
+    ErrorPercentThreshold: 25
+  fuse:
+    Timeout: 1000
+    MaxConcurrentRequests: 100
+    RequestVolumeThreshold: 10
+    ErrorPercentThreshold: 25
+
+

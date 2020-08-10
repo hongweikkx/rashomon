@@ -4,6 +4,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
+	"github.com/hongweikkx/rashomon/hystrix"
 	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/router"
 	"golang.org/x/net/context"
@@ -26,6 +27,8 @@ func main() {
 		log.SugarLogger.Error("conf err:", err.Error())
 		return
 	}
+	// hystrix
+	hystrix.InitHystrix()
 
 	// http server
 	engine := gin.New()
