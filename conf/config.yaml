@@ -1,0 +1,4 @@
+HttpServer:
+  Addr: ":8080"
+GrpcServer:
+  Addr: ":8081"
