@@ -4,6 +4,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
+	"github.com/hongweikkx/rashomon/etcd"
 	"github.com/hongweikkx/rashomon/hystrix"
 	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/router"
@@ -27,6 +28,12 @@ func main() {
 		log.SugarLogger.Error("conf err:", err.Error())
 		return
 	}
+	// etcd
+	etcdCli, err := etcd.New()
+	if err != nil {
+		log.SugarLogger.Error("etcd err:", err.Error())
+	}
+	defer etcdCli.Close()
 	// hystrix
 	hystrix.InitHystrix()
 

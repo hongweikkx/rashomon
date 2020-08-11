@@ -3,17 +3,24 @@ HttpServer:
 GrpcServer:
   Addr: ":8081"
 Hystrix:
-  degrade:
+  Degrade:
     Timeout: 100000
     MaxConcurrentRequests: 100
     RequestVolumeThreshold: 10
     ErrorPercentThreshold: 25
-  fuse:
+  Fuse:
     Timeout: 100000
     MaxConcurrentRequests: 100
     RequestVolumeThreshold: 10
     ErrorPercentThreshold: 25
 JWT:
-  enable: true
+  Enable: false
+ETCD:
+  EndPoints:
+    - "localhost:1111"
+    - "localhost:2222"
+    - "localhost:3333"
+  DailTimeout: 5   #
+
 
 

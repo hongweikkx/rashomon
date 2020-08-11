@@ -28,11 +28,17 @@ type JWTConf struct {
 	Enable bool
 }
 
+type ETCDConf struct {
+	EndPoints []string
+	DailTimeout int
+}
+
 type Config struct {
 	HttpServer HttpServerConf `yaml:"httpServer"`
 	GrpcServer GrpcServerConf `yaml:"grpcServer"`
 	Hystrix HystrixConf `yaml:"Hystrix"`
 	JWT JWTConf `yaml:"JWT"`
+	ETCD ETCDConf `yaml:"ETCD"`
 }
 
 var AppConfig Config
