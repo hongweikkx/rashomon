@@ -24,10 +24,15 @@ type HystrixConf struct {
 	Fuse HystrixModelConf
 }
 
+type JWTConf struct {
+	Enable bool
+}
+
 type Config struct {
 	HttpServer HttpServerConf `yaml:"httpServer"`
 	GrpcServer GrpcServerConf `yaml:"grpcServer"`
 	Hystrix HystrixConf `yaml:"Hystrix"`
+	JWT JWTConf `yaml:"JWT"`
 }
 
 var AppConfig Config

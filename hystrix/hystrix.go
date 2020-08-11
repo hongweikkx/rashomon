@@ -2,7 +2,9 @@ package hystrix
 
 import (
 	"github.com/afex/hystrix-go/hystrix"
+	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
+	"net/http"
 )
 
 func InitHystrix() {
@@ -19,3 +21,28 @@ func InitHystrix() {
 		ErrorPercentThreshold: conf.AppConfig.Hystrix.Fuse.ErrorPercentThreshold,
 	})
 }
+
+func HandleFuse(c *gin.Context) {
+	hystrix.Go("fuse", func() error {
+		c.Next()
+		return nil
+	}, func(err error) error {
+		c.String(http.StatusInternalServerError, "service degrade")
+		return nil
+	})
+}
+
+func HandleDegrade(c *gin.Context) {
+	hystrix.Go("degrade", func() error {
+		c.Next()
+		return nil
+	}, func(err error) error {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+			"status": "service degrade",
+		})
+		return nil
+	})
+}
+
+
