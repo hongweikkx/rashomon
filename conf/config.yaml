@@ -22,6 +22,9 @@ ETCD:
     - "localhost:2222"
     - "localhost:3333"
   DailTimeout: 5   #
+LoadBalance:
+  Algorithm: 2   # WeightedRoundRobin = 1 / RoundRobin = 2 / consistentHashing = 3  | default = 2
+
 
 
 

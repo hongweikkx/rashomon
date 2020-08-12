@@ -34,12 +34,17 @@ type ETCDConf struct {
 	DailTimeout int
 }
 
+type LoadBalanceConf struct {
+	Algorithm int
+}
+
 type Config struct {
-	HttpServer HttpServerConf `yaml:"httpServer"`
-	GrpcServer GrpcServerConf `yaml:"grpcServer"`
+	HttpServer HttpServerConf `yaml:"HttpServer"`
+	GrpcServer GrpcServerConf `yaml:"GrpcServer"`
 	Hystrix HystrixConf `yaml:"Hystrix"`
 	JWT JWTConf `yaml:"JWT"`
 	ETCD ETCDConf `yaml:"ETCD"`
+	LoadBalance LoadBalanceConf `yaml:"LoadBalance"`
 }
 
 var AppConfig Config
