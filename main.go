@@ -29,11 +29,12 @@ func main() {
 		return
 	}
 	// etcd
-	etcdCli, err := etcd.New()
-	if err != nil {
-		log.SugarLogger.Error("etcd err:", err.Error())
+	if conf.AppConfig.ETCD.Enable {
+		err = etcd.New()
+		if err != nil {
+			log.SugarLogger.Error("etcd err:", err.Error())
+		}
 	}
-	defer etcdCli.Close()
 	// hystrix
 	hystrix.InitHystrix()
 

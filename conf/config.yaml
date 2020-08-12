@@ -16,6 +16,7 @@ Hystrix:
 JWT:
   Enable: false
 ETCD:
+  Enable: false
   EndPoints:
     - "localhost:1111"
     - "localhost:2222"

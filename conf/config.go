@@ -29,6 +29,7 @@ type JWTConf struct {
 }
 
 type ETCDConf struct {
+	Enable bool
 	EndPoints []string
 	DailTimeout int
 }

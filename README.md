@@ -1,5 +1,5 @@
 # rashomon
-Gateway
+API Gateway
 
 做一个网关系统， 这个系统拥有的功能点
 * 协议代理。 可以作为grpc/http/tcp 的协议代理
