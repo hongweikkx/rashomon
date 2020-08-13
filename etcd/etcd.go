@@ -5,41 +5,63 @@ import (
 	"errors"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
+	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/client"
 	"sync"
 	"time"
 )
 
 
+// todo  还是应该采用最新的etcd v3的实现来做。
+// todo  先自己摸索下吧
+// todo 先用网上的说法吧。 然后在看看k8s的做法
+
 type Master struct{
-	Members sync.Map
-	KeysAPI client.KeysAPI
+	Cli *clientv3.Client
+	Members []Member
+	lock  sync.RWMutex
+	WatchKey string
 }
 
 type Member struct {
 	InGroup bool
-	Value string
+	EndPoint EndPoint
 }
 
+type EndPoint struct {
+	IP string
+	Port int
+}
 
-func New() error{
-	cli, err := client.New(client.Config{
+// 新建一个监控
+func New(WatchKey string, endPoints []EndPoint) (*Master, error){
+	// etcd client
+	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   conf.AppConfig.ETCD.EndPoints,
-		Transport: client.DefaultTransport,
-		HeaderTimeoutPerRequest: time.Duration(conf.AppConfig.ETCD.DailTimeout) * time.Second,
+		DialTimeout: time.Duration(conf.AppConfig.ETCD.DailTimeout) * time.Second,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
+	// init members
+	members := []Member{}
+	for _, endPoint := range endPoints {
+		members = append(members, Member{InGroup: false, EndPoint: endPoint})
+	}
+	// fill master
 	master := &Master {
-		KeysAPI: client.NewKeysAPI(cli),
+		Cli: cli,
+		Members: members,
+		WatchKey: WatchKey,
 	}
-	go master.WatchWorkers()
-	return nil
+	// watch
+	go master.WatchWorkers(master.WatchKey)
+	return master, nil
 }
 
-func (master *Master)WatchWorkers() {
-	watcher := master.KeysAPI.Watcher("workers/", &client.WatcherOptions{
+
+func (master *Master)WatchWorkers(key string) {
+	watcher := master.KeysAPI.Watcher(key, &client.WatcherOptions{
 		Recursive: true,
 	})
 	for {

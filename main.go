@@ -25,15 +25,18 @@ func main() {
 	// conf
 	err := conf.InitConf()
 	if err != nil {
-		log.SugarLogger.Error("conf err:", err.Error())
+		log.SugarLogger.Fatal("conf err:", err.Error())
 		return
 	}
 	// etcd
 	if conf.AppConfig.ETCD.Enable {
-		err = etcd.New()
+		// todo 应该是有多个这种  因为api server 接的是多组 而非一组
+		master, err := etcd.New("master/", []etcd.EndPoint{})
 		if err != nil {
-			log.SugarLogger.Error("etcd err:", err.Error())
+			log.SugarLogger.Fatal("etcd err:", err.Error())
+			return
 		}
+		defer master.Cli.Close()
 	}
 	// hystrix
 	hystrix.InitHystrix()
