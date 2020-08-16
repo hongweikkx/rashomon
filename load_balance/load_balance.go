@@ -28,7 +28,7 @@ const ConsistentHashing = 3
 func (serverPool *ServerPool)ReplaceServer(s Server) {
 	defer serverPool.lock.Unlock()
 	serverPool.lock.Lock()
-	if index := isConlict(serverPool.Servers, s.URL); index != -1 {
+	if index := serverPool.isConlict(s.URL); index != -1 {
 		serverPool.Servers[index] = s
 		return
 	}else {
@@ -57,10 +57,10 @@ func (serverPool *ServerPool)GetNext() (Server, error){
 }
 
 
-func isConlict(servers []Server, url *url.URL) int{
-	for i:=0; i< len(servers); i++ {
-		if servers[i].URL == url {
-			return i
+func (ServerPool *ServerPool)isConlict(url *url.URL) int{
+	for k, v := range ServerPool.Servers {
+		if v.URL == url {
+			return k
 		}
 	}
 	return -1
