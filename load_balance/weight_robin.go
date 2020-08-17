@@ -1,7 +1,10 @@
 package load_balance
 
 
-func (serverPool *ServerPool)GetNextWithWRR() int{
+type WeightedRoundRobinAL struct {
+}
+
+func (al WeightedRoundRobinAL)GetNext() int{
 	// todo
 	return -1
 }

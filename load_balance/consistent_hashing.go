@@ -1,5 +1,8 @@
 package load_balance
 
-func (serverPool *ServerPool)GetNextWithCH() int {
+type ConsistentHashAL struct {
+
+}
+func (al *ConsistentHashAL)GetNext() int {
 	return -1
 }
