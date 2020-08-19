@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/etcd"
-	"github.com/hongweikkx/rashomon/hystrix"
 	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/router"
 	"golang.org/x/net/context"
@@ -25,19 +24,18 @@ func main() {
 	// conf
 	err := conf.InitConf()
 	if err != nil {
-		log.SugarLogger.Error("conf err:", err.Error())
+		log.SugarLogger.Fatal("conf err:", err.Error())
 		return
 	}
 	// etcd
 	if conf.AppConfig.ETCD.Enable {
-		err = etcd.New()
+		master, err := etcd.New()
 		if err != nil {
-			log.SugarLogger.Error("etcd err:", err.Error())
+			log.SugarLogger.Fatal("etcd err:", err.Error())
+			return
 		}
+		defer master.Cli.Close()
 	}
-	// hystrix
-	hystrix.InitHystrix()
-
 	// http server
 	engine := gin.New()
 	router.Use(engine)

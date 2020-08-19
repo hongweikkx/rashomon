@@ -1,6 +1,10 @@
 package load_balance
 
-func (serverPool *ServerPool)GetNextWithRR() int{
-	cur := serverPool.Current
-	return (cur + 1)%len(serverPool.Servers)
+
+type RoundRobinAL struct {
+}
+
+func (al RoundRobinAL)GetNext() int{
+	cur := ServerPoolLB.Current
+	return (cur + 1)%len(ServerPoolLB.Servers)
 }

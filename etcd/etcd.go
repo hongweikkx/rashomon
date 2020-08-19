@@ -2,87 +2,84 @@ package etcd
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
-	"go.etcd.io/etcd/client"
+	"go.etcd.io/etcd/clientv3"
+	mvccpb "github.com/coreos/etcd/mvcc/mvccpb"
 	"sync"
 	"time"
 )
 
 
+// todo 看看k8s的做法
 type Master struct{
+	Cli *clientv3.Client
 	Members sync.Map
-	KeysAPI client.KeysAPI
+}
+
+type ServiceInfo struct {
+	Ip string
+	Port string
 }
 
 type Member struct {
-	InGroup bool
-	Value string
+	EndPoint ServiceInfo
 }
 
-
-func New() error{
-	cli, err := client.New(client.Config{
+// 新建一个监控
+func New() (*Master, error){
+	watchKey := conf.AppConfig.ETCD.WatchPrix
+	// etcd client
+	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   conf.AppConfig.ETCD.EndPoints,
-		Transport: client.DefaultTransport,
-		HeaderTimeoutPerRequest: time.Duration(conf.AppConfig.ETCD.DailTimeout) * time.Second,
+		DialTimeout: time.Duration(conf.AppConfig.ETCD.DailTimeout) * time.Second,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	master := &Master {
-		KeysAPI: client.NewKeysAPI(cli),
+	// init
+	res, err := cli.Get(context.Background(), watchKey, clientv3.WithPrefix())
+	if err != nil {
+		return nil, err
 	}
-	go master.WatchWorkers()
-	return nil
+	master := &Master { Cli: cli}
+	for _, v := range res.Kvs {
+		master.Add(v.Key, v.Value)
+	}
+	// watch
+	go master.WatchWorkers(watchKey)
+	return master, nil
 }
 
-func (master *Master)WatchWorkers() {
-	watcher := master.KeysAPI.Watcher("workers/", &client.WatcherOptions{
-		Recursive: true,
-	})
-	for {
-		res, err := watcher.Next(context.Background())
-		if err != nil {
-			log.SugarLogger.Error("watch error:", err.Error())
-			break
-		}
-		// action: get, set, delete, update, create, compareAndSwap, compareAndDelete and expire.
-		// todo 我不认为这样做是对的  因为首先expire的使用 在blog上就不是很好
-		// todo 其次这次 action没有都包含进去， 比如compareAnd 这些是？
-		// todo 看下k8s是怎么做的吧
-		switch res.Action {
-		case "expire":
-			err := master.Update(res.PrevNode.Key, false)
-			if err != nil {
-				log.SugarLogger.Error("service member error:", err.Error())
+
+func (master *Master)WatchWorkers(key string) {
+	watchCh := master.Cli.Watch(context.Background(), key, clientv3.WithPrefix())
+	for watchMsg := range watchCh {
+		for _, event := range watchMsg.Events {
+			switch event.Type {
+			case mvccpb.PUT:
+				master.Add(event.Kv.Key, event.Kv.Value)
+			case mvccpb.DELETE:
+				master.Delete(event.Kv.Key)
 			}
-		case "delete":
-			master.Delete(res.Node.Key)
-		case "set", "create":
-			master.Add(res.Node.Key, &Member{InGroup: true, Value: res.Node.Value})
 		}
+
 	}
 }
 
-
-func (this *Master)Update(key string, inGroup bool) error{
-	if v, ok := this.Members.Load(key); ok {
-		member := v.(Member)
-		member.InGroup = inGroup
-		this.Members.Store(key, member)
-		return nil
-	}else {
-		return errors.New("member:" + key + "is not exist")
+func (this *Master)Add(keyByte []byte, serviceByte []byte) {
+	key := string(keyByte)
+	var service ServiceInfo
+	err := json.Unmarshal(serviceByte, &service)
+	if err != nil {
+		log.SugarLogger.Error("Add error:" + key + err.Error())
+		return
 	}
+	this.Members.Store(key, service)
 }
 
-func (this *Master)Add(key string, member *Member) {
-	member.InGroup = true
-	this.Members.Store(key, member)
+func (this *Master)Delete(keyByte []byte) {
+	this.Members.Delete(string(keyByte))
 }
 
-func (this *Master)Delete(key string) {
-	this.Delete(key)
-}

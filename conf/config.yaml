@@ -17,6 +17,7 @@ JWT:
   Enable: false
 ETCD:
   Enable: false
+  WatchPrix: "service/"
   EndPoints:
     - "localhost:1111"
     - "localhost:2222"

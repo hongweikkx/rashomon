@@ -8,6 +8,10 @@ import (
 	"sync"
 )
 
+const WeightedRoundRobin = 1
+const RoundRobin = 2
+const ConsistentHashing = 3
+
 type Server struct {
 	URL   *url.URL
 	Weight int
@@ -18,14 +22,38 @@ type ServerPool struct {
 	Servers []Server
 	Current int
 	lock  sync.RWMutex
+	LoadBalance LoadBalanceAPI
 }
 
+type LoadBalanceAPI interface {
+	GetNext() int
+}
 
-const WeightedRoundRobin = 1
-const RoundRobin = 2
-const ConsistentHashing = 3
+var ServerPoolLB ServerPool
 
-func (serverPool *ServerPool)ReplaceServer(s Server) {
+// todo 1. simple factory
+func init() {
+	ServerPoolLB =
+	ServerPool{
+		Servers:     nil,
+		Current:     0,
+		lock:        sync.RWMutex{},
+		LoadBalance: NewLBAPI(),
+	}
+}
+
+func NewLBAPI() LoadBalanceAPI{
+	switch conf.AppConfig.LoadBalance.Algorithm  {
+	case WeightedRoundRobin:
+		return &WeightedRoundRobinAL{}
+	case ConsistentHashing:
+		return &ConsistentHashAL{}
+	default:
+		return &RoundRobinAL{}
+	}
+}
+
+func (serverPool *ServerPool)UpdateServer(s Server) {
 	defer serverPool.lock.Unlock()
 	serverPool.lock.Lock()
 	if index := serverPool.isConlict(s.URL); index != -1 {
@@ -37,17 +65,9 @@ func (serverPool *ServerPool)ReplaceServer(s Server) {
 }
 
 func (serverPool *ServerPool)GetNext() (Server, error){
-	defer serverPool.lock.RUnlock()
-	serverPool.lock.RLock()
-	index := serverPool.Current
-	switch conf.AppConfig.LoadBalance.Algorithm {
-	case WeightedRoundRobin:
-		index = serverPool.GetNextWithWRR()
-	case ConsistentHashing:
-		index =  serverPool.GetNextWithCH()
-	default:
-		index =  serverPool.GetNextWithRR()
-	}
+	defer serverPool.lock.Unlock()
+	serverPool.lock.Lock()
+	index := serverPool.LoadBalance.GetNext()
 	if index == -1 {
 		log.SugarLogger.Error("none server can use")
 		return serverPool.Servers[serverPool.Current], errors.New("none server can use")
@@ -57,8 +77,9 @@ func (serverPool *ServerPool)GetNext() (Server, error){
 }
 
 
-func (ServerPool *ServerPool)isConlict(url *url.URL) int{
-	for k, v := range ServerPool.Servers {
+// must hold the lock
+func (serverPool *ServerPool)isConlict(url *url.URL) int{
+	for k, v := range serverPool.Servers {
 		if v.URL == url {
 			return k
 		}

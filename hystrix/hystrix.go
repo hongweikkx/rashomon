@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func InitHystrix() {
+func init() {
 	hystrix.ConfigureCommand("degrade", hystrix.CommandConfig{
 		Timeout:               conf.AppConfig.Hystrix.Degrade.Timeout,
 		MaxConcurrentRequests: conf.AppConfig.Hystrix.Degrade.MaxConcurrentRequests,

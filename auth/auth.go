@@ -2,7 +2,7 @@ package auth
 
 import (
 	"github.com/hongweikkx/rashomon/hystrix"
-	jwt "github.com/appleboy/gin-jwt"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/log"
 	"net/http"

@@ -32,6 +32,7 @@ type ETCDConf struct {
 	Enable bool
 	EndPoints []string
 	DailTimeout int
+	WatchPrix string
 }
 
 type LoadBalanceConf struct {
