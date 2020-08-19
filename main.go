@@ -29,8 +29,7 @@ func main() {
 	}
 	// etcd
 	if conf.AppConfig.ETCD.Enable {
-		// todo 应该是有多个这种  因为api server 接的是多组 而非一组
-		master, err := etcd.New("master/", []etcd.EndPoint{})
+		master, err := etcd.New()
 		if err != nil {
 			log.SugarLogger.Fatal("etcd err:", err.Error())
 			return

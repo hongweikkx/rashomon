@@ -11,16 +11,14 @@ import (
 	"time"
 )
 
-type ServiceInfo struct {
-	Ip string
-}
+
 
 type Service struct {
-	Name string
-	Info ServiceInfo
-	Cli  *clientv3.Client
-	Stop  chan error
-	Leaseid   clientv3.LeaseID
+	Name    string
+	Info    ServiceInfo
+	Cli     *clientv3.Client
+	Stop    chan error
+	LeaseId clientv3.LeaseID
 }
 
 var ServiceRegClient Service
@@ -39,6 +37,7 @@ func ServiceRegInitClient(name string, info ServiceInfo) {
 		log.SugarLogger.Error("service stop with error:", err.Error())
 	}
 }
+
 
 func (service *Service) Start() error{
 	keepAliveCh, err := service.KeepAlive()
@@ -76,13 +75,13 @@ func (service *Service) KeepAlive() (<-chan *clientv3.LeaseKeepAliveResponse, er
 	if err != nil {
 		return nil, err
 	}
-	service.Leaseid = resp.ID
+	service.LeaseId = resp.ID
 	return service.Cli.KeepAlive(context.TODO(), resp.ID)
 }
 
 
 func (service *Service)Revoke() error{
-	_, err := service.Cli.Revoke(context.TODO(), service.Leaseid)
+	_, err := service.Cli.Revoke(context.TODO(), service.LeaseId)
 	if err != nil {
 		log.SugarLogger.Error("err:", err.Error())
 	}
