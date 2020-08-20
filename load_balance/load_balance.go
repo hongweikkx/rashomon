@@ -14,8 +14,6 @@ const ConsistentHashing = 3
 
 type Server struct {
 	URL   *url.URL
-	Weight int
-	Alive  bool
 }
 
 type ServerPool struct {
@@ -26,6 +24,7 @@ type ServerPool struct {
 }
 
 type LoadBalanceAPI interface {
+	// must hold the lock
 	GetNext() int
 }
 
