@@ -2,14 +2,14 @@ package load_balance
 
 import "net/url"
 
-type node struct {
+type WNode struct {
 	Url *url.URL
 	Weight int
 	CurrentWeight int
 }
 
 type WeightedRoundRobinAL struct {
-	Nodes []node
+	Nodes []WNode
 }
 
 func (al WeightedRoundRobinAL)GetNext() int{

@@ -21,8 +21,10 @@ beego vs gin: 选择gin。 因为不需要MVC架构。 GIN 可以满足需求。
 
 
 ## todo
-负载均衡
+consistent_hashing
 vue
+单测: load balance 各个算法。 etcd的服务发现。
+组装：负载均衡和服务发现和gin
 
 
 

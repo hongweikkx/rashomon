@@ -18,7 +18,6 @@ type Server struct {
 
 type ServerPool struct {
 	Servers []Server
-	Current int
 	lock  sync.RWMutex
 	LoadBalance LoadBalanceAPI
 }
@@ -35,7 +34,6 @@ func init() {
 	ServerPoolLB =
 	ServerPool{
 		Servers:     nil,
-		Current:     0,
 		lock:        sync.RWMutex{},
 		LoadBalance: NewLBAPI(),
 	}
@@ -63,16 +61,15 @@ func (serverPool *ServerPool)UpdateServer(s Server) {
 	}
 }
 
-func (serverPool *ServerPool)GetNext() (Server, error){
+func (serverPool *ServerPool)GetNext() (*Server, error){
 	defer serverPool.lock.Unlock()
 	serverPool.lock.Lock()
 	index := serverPool.LoadBalance.GetNext()
 	if index == -1 {
 		log.SugarLogger.Error("none server can use")
-		return serverPool.Servers[serverPool.Current], errors.New("none server can use")
+		return nil, errors.New("none server can use")
 	}
-	serverPool.Current = index
-	return serverPool.Servers[index], nil
+	return &serverPool.Servers[index], nil
 }
 
 
