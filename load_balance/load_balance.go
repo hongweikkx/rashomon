@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
-	"net/url"
 	"sync"
 )
 
@@ -13,7 +12,8 @@ const RoundRobin = 2
 const ConsistentHashing = 3
 
 type Server struct {
-	URL   *url.URL
+	Address   string
+	Weight    int
 }
 
 type ServerPool struct {
@@ -23,8 +23,11 @@ type ServerPool struct {
 }
 
 type LoadBalanceAPI interface {
+	Init()
 	// must hold the lock
 	GetNext() int
+	ADD(server Server)
+	DELETE(address string)
 }
 
 var ServerPoolLB ServerPool
@@ -40,24 +43,42 @@ func init() {
 }
 
 func NewLBAPI() LoadBalanceAPI{
+	var api LoadBalanceAPI
 	switch conf.AppConfig.LoadBalance.Algorithm  {
 	case WeightedRoundRobin:
-		return &WeightedRoundRobinAL{}
+		api = &WeightedRoundRobinAL{}
 	case ConsistentHashing:
-		return &ConsistentHashAL{}
+		api = &ConsistentHashAL{}
 	default:
-		return &RoundRobinAL{}
+		api = &RoundRobinAL{}
 	}
+	api.Init()
+	return api
 }
 
 func (serverPool *ServerPool)UpdateServer(s Server) {
-	defer serverPool.lock.Unlock()
 	serverPool.lock.Lock()
-	if index := serverPool.isConlict(s.URL); index != -1 {
+	defer serverPool.lock.Unlock()
+	if index := serverPool.isExist(s.Address); index != -1 {
 		serverPool.Servers[index] = s
-		return
 	}else {
 		serverPool.Servers = append(serverPool.Servers, s)
+	}
+	serverPool.LoadBalance.ADD(s)
+}
+
+func (ServerPool *ServerPool)DeleteServer(s Server) {
+	ServerPool.lock.Lock()
+	defer ServerPool.lock.Unlock()
+	if index := ServerPool.isExist(s.Address); index != -1 {
+		// delete
+		l := len(ServerPool.Servers)
+		if index == l -1 {
+			ServerPool.Servers = ServerPool.Servers[:l-1]
+		}else {
+			ServerPool.Servers = append(ServerPool.Servers[:index], ServerPool.Servers[index+1:]...)
+		}
+		ServerPool.LoadBalance.DELETE(s.Address)
 	}
 }
 
@@ -74,9 +95,9 @@ func (serverPool *ServerPool)GetNext() (*Server, error){
 
 
 // must hold the lock
-func (serverPool *ServerPool)isConlict(url *url.URL) int{
+func (serverPool *ServerPool) isExist(address string) int{
 	for k, v := range serverPool.Servers {
-		if v.URL == url {
+		if v.Address == address {
 			return k
 		}
 	}
