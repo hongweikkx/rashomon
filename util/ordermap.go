@@ -1,6 +1,9 @@
 package util
 
-import "sort"
+import (
+	"errors"
+	"sort"
+)
 
 type OrderKey struct {
 	key     interface{}
@@ -26,6 +29,10 @@ func NewOrderMap(f func(a, b interface{})bool) *OrderMap{
 	mapOrderKeys := MapOrderKeys{lessFunc: f}
 	orderMap := &OrderMap{sortedKeys: mapOrderKeys, mapI: make(map[interface{}]interface{})}
 	return orderMap
+}
+
+func (om *OrderMap) Len() int {
+	return len(om.mapI)
 }
 
 func (om *OrderMap) Add(key interface{}, value interface{}, rankKey interface{}){
@@ -70,6 +77,15 @@ func (om *OrderMap) Iter() []interface{}{
 		ret = append(ret, KV{v.key,om.mapI[v.key]})
 	}
 	return ret
+}
+
+func (om *OrderMap) First() (interface{}, error) {
+	if om.Len() <= 0 {
+		return nil, errors.New("order map is nil")
+	}
+	key := om.sortedKeys.sortedList[0].key
+	return KV{K:key, V:om.mapI[key]}, nil
+
 }
 
 func (keys MapOrderKeys) Len() int{

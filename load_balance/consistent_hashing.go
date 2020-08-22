@@ -33,9 +33,25 @@ func (al *ConsistentHashAL) DELETE(address string) {
 	al.Nodes.Delete(address)
 }
 
-// todo
-func (al *ConsistentHashAL)GetNext() int {
-	//for _, v := range al.Nodes.Iter() {
-	//}
+func (al *ConsistentHashAL)GetNext(str string) int {
+	firstKV, err := al.Nodes.First()
+	if err != nil {
+		return -1
+	}
+	address := firstKV.(util.KV).K
+	md5 := util.MD5INT32(str)
+	for _, node := range al.Nodes.Iter() {
+		chNode := node.(util.KV).V.(CHNode)
+		if md5 < chNode.Num {
+			address = chNode.Address
+			break
+		}
+	}
+
+	for k, v := range ServerPoolLB.Servers {
+		if v.Address == address {
+			return k
+		}
+	}
 	return -1
 }

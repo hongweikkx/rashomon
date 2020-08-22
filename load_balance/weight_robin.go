@@ -30,7 +30,7 @@ func (al *WeightedRoundRobinAL) DELETE(address string) {
 	}
 }
 
-func (al *WeightedRoundRobinAL)GetNext() int{
+func (al *WeightedRoundRobinAL)GetNext(_str string) int{
 	if len(al.Nodes) <= 0 {
 		return -1
 	}

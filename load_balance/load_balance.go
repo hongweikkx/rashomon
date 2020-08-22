@@ -25,7 +25,7 @@ type ServerPool struct {
 type LoadBalanceAPI interface {
 	Init()
 	// must hold the lock
-	GetNext() int
+	GetNext(string) int
 	ADD(server Server)
 	DELETE(address string)
 }
