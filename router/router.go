@@ -1,10 +1,10 @@
 package router
 
 import (
-	"github.com/hongweikkx/rashomon/hystrix"
+	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/auth"
+	"github.com/hongweikkx/rashomon/middleware/auth"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
 	"net/http"

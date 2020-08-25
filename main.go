@@ -4,7 +4,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
-	"github.com/hongweikkx/rashomon/etcd"
+	"github.com/hongweikkx/rashomon/service_discovery/etcd"
 	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/router"
 	"golang.org/x/net/context"
