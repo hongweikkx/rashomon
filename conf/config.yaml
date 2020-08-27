@@ -1,9 +1,11 @@
-ENV: "prod"
+ENV: "beta"
 Proxy:
   HttpServer:
-    addr: ":8080"
+    Addr: ":9090"
   GrpcServer:
-    Addr: ":8081"
+    Addr: ":9091"
+DashBoard:
+    Addr: ":8080"
 Storage:
   Service: "etcd"
   ETCD:

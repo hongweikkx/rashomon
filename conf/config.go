@@ -45,9 +45,14 @@ type StorageConf struct {
 	ETCD ETCDConf `yaml:"ETCD"`
 }
 
+type DashBoradConf struct {
+	Addr string
+}
+
 type Config struct {
 	ENV   string    `yaml:"ENV"`
 	Proxy ProxyConf `yaml:"Proxy"`
+	DashBoard DashBoradConf `yaml:"DashBoard"`
 	Storage StorageConf `yaml:"Storage"`
 	Hystrix HystrixConf `yaml:"Hystrix"`
 }

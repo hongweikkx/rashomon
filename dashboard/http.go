@@ -1,55 +1,58 @@
-package proxyhttp
+package dashboard
 
 import (
+	"context"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
-	"github.com/hongweikkx/rashomon/middleware/hystrix"
-	"context"
+	"github.com/hongweikkx/rashomon/middleware/auth"
 	"net/http"
 	"time"
 )
 
-func Start() *http.Server{
+type Dashboard struct {
+	Serv *http.Server
+}
+
+var DashboardIns *Dashboard
+
+func Start() {
 	if conf.IsProd() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	engine := gin.New()
 	router(engine)
 	serv := &http.Server{
-		Addr: conf.AppConfig.Proxy.HttpServer.Addr,
+		Addr: conf.AppConfig.DashBoard.Addr,
 		Handler: engine,
 	}
+	DashboardIns = &Dashboard{Serv: serv}
 	go func() {
 		if err := serv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.SugarLogger.Fatal("http serv err:", err.Error())
 		}
 	}()
-	return serv
 }
 
-func Stop(httpServer *http.Server) {
+func Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := httpServer.Shutdown(ctx); err != nil {
+	if err := DashboardIns.Serv.Shutdown(ctx); err != nil {
 		log.SugarLogger.Info("http server forced to shutdown:", err)
 	}
 }
 
 func router(engine *gin.Engine) {
+	authMiddleware := auth.New()
+	auth.Use(authMiddleware, engine)
 	engine.NoRoute(handleNoRoute)
 	//middleware
 	engine.Use(
 		ginzap.Ginzap(log.Logger, time.RFC3339, true),
 		ginzap.RecoveryWithZap(log.Logger, true),
 	)
-	engine.GET("/pingDegrade", hystrix.HandleFuse, handlePing)
-	engine.GET("/pingFuse", hystrix.HandleFuse, handlePing)
-}
-
-func handleNoRoute(c *gin.Context) {
-	c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
+	engine.GET("/ping", handlePing)
 }
 
 
@@ -58,3 +61,8 @@ func handlePing(c *gin.Context) {
 		"message": "pong",
 	})
 }
+
+func handleNoRoute(c *gin.Context) {
+	c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
+}
+
