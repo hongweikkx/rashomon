@@ -11,6 +11,9 @@ import (
 )
 
 func Start() *http.Server{
+	if conf.IsProd() {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	engine := gin.New()
 	router.Use(engine)
 	serv := &http.Server{
@@ -19,7 +22,7 @@ func Start() *http.Server{
 	}
 	go func() {
 		if err := serv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.SugarLogger.Error("http serv err:", err.Error())
+			log.SugarLogger.Fatal("http serv err:", err.Error())
 		}
 	}()
 	return serv
@@ -29,7 +32,6 @@ func Stop(httpServer *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := httpServer.Shutdown(ctx); err != nil {
-		log.SugarLogger.Error("http server forced to shutdown:", err)
+		log.SugarLogger.Info("http server forced to shutdown:", err)
 	}
-	log.SugarLogger.Error("http server exit")
 }

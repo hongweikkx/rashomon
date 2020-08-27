@@ -1,21 +1,18 @@
 package router
 
 import (
-	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/middleware/auth"
-	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
+	"github.com/hongweikkx/rashomon/middleware/auth"
+	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	"net/http"
 	"time"
 )
 
 func Use(engine *gin.Engine) {
-	if conf.AppConfig.JWT.Enable {
-		authMiddleware := auth.New()
-		auth.Use(authMiddleware, engine)
-	}
+	authMiddleware := auth.New()
+	auth.Use(authMiddleware, engine)
 	engine.NoRoute(handleNoRoute)
 	//middleware
 	engine.Use(

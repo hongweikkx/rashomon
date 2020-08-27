@@ -15,7 +15,7 @@ func Start() *grpc.Server{
 	s := grpc.NewServer()
 	go func() {
 		if err := s.Serve(lis); err != nil {
-			log.SugarLogger.Error("grpc serv err:", err.Error())
+			log.SugarLogger.Fatal("grpc serv err:", err.Error())
 		}
 	}()
 	return s
@@ -23,5 +23,4 @@ func Start() *grpc.Server{
 
 func Stop(s *grpc.Server) {
 	s.Stop()
-	log.SugarLogger.Error("grpc server exit")
 }

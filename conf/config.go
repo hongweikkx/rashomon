@@ -24,9 +24,6 @@ type HystrixConf struct {
 	Fuse HystrixModelConf
 }
 
-type JWTConf struct {
-	Enable bool
-}
 
 type ETCDConf struct {
 	User string
@@ -37,32 +34,27 @@ type ETCDConf struct {
 }
 
 //Algorithm: 2   # WeightedRoundRobin = 1 / RoundRobin = 2 / consistentHashing = 3  | default = 2
-type LoadBalanceConf struct {
-	Algorithm int
-}
-
 
 type ProxyConf struct {
 	HttpServer HttpServerConf `yaml:"HttpServer"`
 	GrpcServer GrpcServerConf `yaml:"GrpcServer"`
 }
 
-type DiscoveryConf struct {
+type StorageConf struct {
 	Service string
 	ETCD ETCDConf `yaml:"ETCD"`
 }
 
 type Config struct {
+	ENV   string    `yaml:"ENV"`
 	Proxy ProxyConf `yaml:"Proxy"`
-	Discovery DiscoveryConf `yaml:"Discovery"`
+	Storage StorageConf `yaml:"Storage"`
 	Hystrix HystrixConf `yaml:"Hystrix"`
-	JWT JWTConf `yaml:"JWT"`
-	LoadBalance LoadBalanceConf `yaml:"LoadBalance"`
 }
 
 var AppConfig Config
 
-func InitConf() error{
+func Init() error{
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./conf")
@@ -74,4 +66,8 @@ func InitConf() error{
 		return err
 	}
 	return nil
+}
+
+func IsProd() bool{
+	return AppConfig.ENV == "prod"
 }

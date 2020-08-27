@@ -2,17 +2,18 @@ package proxy
 
 import (
 	"github.com/hongweikkx/rashomon/log"
-	"github.com/hongweikkx/rashomon/storage"
-	"os"
-	"os/signal"
-	"syscall"
 	proxygrpc "github.com/hongweikkx/rashomon/proxy/grpc"
 	proxyhttp "github.com/hongweikkx/rashomon/proxy/http"
+	"github.com/hongweikkx/rashomon/storage"
+	"google.golang.org/grpc"
+	"net/http"
 )
 
 type Proxy struct {
 	Clusters []*Cluster
 	StoreCli storage.Storeage
+	HttpServer *http.Server
+	GrpcServer *grpc.Server
 }
 
 type Cluster struct {
@@ -29,24 +30,23 @@ var ProxyIns *Proxy
 
 func Start() {
 	httpServer := proxyhttp.Start()
-	GrpcServer := proxygrpc.Start()
-	storeCli, err := storage.StartStorage()
+	grpcServer := proxygrpc.Start()
+	storeCli, err := storage.Start()
 	if err != nil {
 		log.SugarLogger.Fatal("etcd error:", err.Error())
 	}
 	ProxyIns = &Proxy{
 		Clusters: nil,
 		StoreCli: storeCli,
+		HttpServer: httpServer,
+		GrpcServer: grpcServer,
 	}
-	// stop k
-	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.SugarLogger.Error("Shutting down server...")
-	proxyhttp.Stop(httpServer)
-	proxygrpc.Stop(GrpcServer)
+}
+
+func Stop() {
+	proxyhttp.Stop(ProxyIns.HttpServer)
+	proxygrpc.Stop(ProxyIns.GrpcServer)
 	ProxyIns.StoreCli.Stop()
-	log.SugarLogger.Error("server exit.")
 }
 
 

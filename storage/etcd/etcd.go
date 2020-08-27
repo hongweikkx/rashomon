@@ -3,10 +3,10 @@ package etcd
 import (
 	"context"
 	"encoding/json"
+	"github.com/coreos/etcd/mvcc/mvccpb"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
 	"go.etcd.io/etcd/clientv3"
-	mvccpb "github.com/coreos/etcd/mvcc/mvccpb"
 	"sync"
 	"time"
 )
@@ -27,30 +27,26 @@ type Member struct {
 	EndPoint ServiceInfo
 }
 
-type Auth struct {
-	User     string
-	Password string
-}
-
-// 新建一个监控
-func New(auth Auth) (*Master, error){
-	watchKey := conf.AppConfig.Discovery.ETCD.WatchPrix
-	// etcd client
+func New() (*Master, error){
+	watchKey := conf.AppConfig.Storage.ETCD.WatchPrix
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   conf.AppConfig.Discovery.ETCD.EndPoints,
-		DialTimeout: time.Duration(conf.AppConfig.Discovery.ETCD.DailTimeout) * time.Second,
-		Username: auth.User,
-		Password: auth.Password,
+		Endpoints:   conf.AppConfig.Storage.ETCD.EndPoints,
+		DialTimeout: time.Duration(conf.AppConfig.Storage.ETCD.DailTimeout) * time.Second,
+		Username: conf.AppConfig.Storage.ETCD.User,
+		Password: conf.AppConfig.Storage.ETCD.Password,
 	})
 	if err != nil {
 		return nil, err
 	}
 	// init
-	res, err := cli.Get(context.Background(), watchKey, clientv3.WithPrefix())
+	master := &Master { Cli: cli}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	res, err := cli.Get(ctx, watchKey, clientv3.WithPrefix())
 	if err != nil {
+		log.SugarLogger.Fatal("etcd server start error:", err.Error())
 		return nil, err
 	}
-	master := &Master { Cli: cli}
 	for _, v := range res.Kvs {
 		master.Add(v.Key, v.Value)
 	}
@@ -97,5 +93,4 @@ func (this *Master)Stop() {
 	if err != nil {
 		log.SugarLogger.Error("store cli close error:", err.Error())
 	}
-	log.SugarLogger.Error("store cli close")
 }

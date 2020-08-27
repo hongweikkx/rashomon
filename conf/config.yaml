@@ -1,18 +1,17 @@
+ENV: "prod"
 Proxy:
   HttpServer:
     addr: ":8080"
   GrpcServer:
     Addr: ":8081"
-Discovery:
+Storage:
   Service: "etcd"
   ETCD:
     UserName: "user"
     Password: "password"
     WatchPrix: "service/"
     EndPoints:
-      - "localhost:1111"
-      - "localhost:2222"
-      - "localhost:3333"
+      - "localhost:2379"
     DailTimeout: 5   #
 Hystrix:
   Degrade:

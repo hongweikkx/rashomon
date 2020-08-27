@@ -14,14 +14,14 @@ type Storeage interface {
 	Stop()
 }
 
-func StartStorage() (Storeage, error){
+func Start() (Storeage, error){
 	// 应该是每个proxy有个etcd
-	switch conf.AppConfig.Discovery.Service {
+	switch conf.AppConfig.Storage.Service {
 	case "etcd":
-		master, err := etcd.New(etcd.Auth{User: conf.AppConfig.Discovery.ETCD.User, Password: conf.AppConfig.Discovery.ETCD.Password})
+		master, err := etcd.New()
 		return master, err
 	default:
-		return nil, errors.New("disovery do not support:" + conf.AppConfig.Discovery.Service)
+		return nil, errors.New("disovery do not support:" + conf.AppConfig.Storage.Service)
 	}
 }
 

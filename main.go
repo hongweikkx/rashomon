@@ -5,20 +5,26 @@ import (
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/proxy"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
-	// log
-	log.InitLogger()
-	defer log.Logger.Sync()
-	defer log.SugarLogger.Sync()
-
-	// conf
-	err := conf.InitConf()
+	log.Init()
+	err := conf.Init()
 	if err != nil {
 		log.SugarLogger.Fatal("conf err:", err.Error())
 		return
 	}
 	// proxy
 	proxy.Start()
+	log.SugarLogger.Info("server started...")
+	// wait to stop
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	<-quit
+	proxy.Stop()
+	log.SugarLogger.Info("server exit.")
+	log.Stop()
 }
