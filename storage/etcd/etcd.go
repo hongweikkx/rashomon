@@ -27,13 +27,20 @@ type Member struct {
 	EndPoint ServiceInfo
 }
 
+type Auth struct {
+	User     string
+	Password string
+}
+
 // 新建一个监控
-func New() (*Master, error){
-	watchKey := conf.AppConfig.ETCD.WatchPrix
+func New(auth Auth) (*Master, error){
+	watchKey := conf.AppConfig.Discovery.ETCD.WatchPrix
 	// etcd client
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   conf.AppConfig.ETCD.EndPoints,
-		DialTimeout: time.Duration(conf.AppConfig.ETCD.DailTimeout) * time.Second,
+		Endpoints:   conf.AppConfig.Discovery.ETCD.EndPoints,
+		DialTimeout: time.Duration(conf.AppConfig.Discovery.ETCD.DailTimeout) * time.Second,
+		Username: auth.User,
+		Password: auth.Password,
 	})
 	if err != nil {
 		return nil, err
@@ -54,6 +61,7 @@ func New() (*Master, error){
 
 
 func (master *Master)WatchWorkers(key string) {
+	clientv3.NewWatcher(master.Cli)
 	watchCh := master.Cli.Watch(context.Background(), key, clientv3.WithPrefix())
 	for watchMsg := range watchCh {
 		for _, event := range watchMsg.Events {
@@ -83,3 +91,11 @@ func (this *Master)Delete(keyByte []byte) {
 	this.Members.Delete(string(keyByte))
 }
 
+
+func (this *Master)Stop() {
+	err := this.Cli.Close()
+	if err != nil {
+		log.SugarLogger.Error("store cli close error:", err.Error())
+	}
+	log.SugarLogger.Error("store cli close")
+}

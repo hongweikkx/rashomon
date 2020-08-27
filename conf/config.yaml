@@ -1,7 +1,19 @@
-HttpServer:
-  Addr: ":8080"
-GrpcServer:
-  Addr: ":8081"
+Proxy:
+  HttpServer:
+    addr: ":8080"
+  GrpcServer:
+    Addr: ":8081"
+Discovery:
+  Service: "etcd"
+  ETCD:
+    UserName: "user"
+    Password: "password"
+    WatchPrix: "service/"
+    EndPoints:
+      - "localhost:1111"
+      - "localhost:2222"
+      - "localhost:3333"
+    DailTimeout: 5   #
 Hystrix:
   Degrade:
     Timeout: 100000
@@ -13,18 +25,6 @@ Hystrix:
     MaxConcurrentRequests: 100
     RequestVolumeThreshold: 10
     ErrorPercentThreshold: 25
-JWT:
-  Enable: false
-ETCD:
-  Enable: false
-  WatchPrix: "service/"
-  EndPoints:
-    - "localhost:1111"
-    - "localhost:2222"
-    - "localhost:3333"
-  DailTimeout: 5   #
-LoadBalance:
-  Algorithm: 2   # WeightedRoundRobin = 1 / RoundRobin = 2 / consistentHashing = 3  | default = 2
 
 
 

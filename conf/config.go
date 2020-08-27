@@ -29,22 +29,34 @@ type JWTConf struct {
 }
 
 type ETCDConf struct {
-	Enable bool
+	User string
+	Password string
 	EndPoints []string
 	DailTimeout int
 	WatchPrix string
 }
 
+//Algorithm: 2   # WeightedRoundRobin = 1 / RoundRobin = 2 / consistentHashing = 3  | default = 2
 type LoadBalanceConf struct {
 	Algorithm int
 }
 
-type Config struct {
+
+type ProxyConf struct {
 	HttpServer HttpServerConf `yaml:"HttpServer"`
 	GrpcServer GrpcServerConf `yaml:"GrpcServer"`
+}
+
+type DiscoveryConf struct {
+	Service string
+	ETCD ETCDConf `yaml:"ETCD"`
+}
+
+type Config struct {
+	Proxy ProxyConf `yaml:"Proxy"`
+	Discovery DiscoveryConf `yaml:"Discovery"`
 	Hystrix HystrixConf `yaml:"Hystrix"`
 	JWT JWTConf `yaml:"JWT"`
-	ETCD ETCDConf `yaml:"ETCD"`
 	LoadBalance LoadBalanceConf `yaml:"LoadBalance"`
 }
 

@@ -85,7 +85,8 @@ func (ServerPool *ServerPool)DeleteServer(s Server) {
 func (serverPool *ServerPool)GetNext() (*Server, error){
 	defer serverPool.lock.Unlock()
 	serverPool.lock.Lock()
-	index := serverPool.LoadBalance.GetNext()
+	// todo the args
+	index := serverPool.LoadBalance.GetNext("")
 	if index == -1 {
 		log.SugarLogger.Error("none server can use")
 		return nil, errors.New("none server can use")

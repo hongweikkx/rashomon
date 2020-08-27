@@ -25,8 +25,8 @@ var ServiceRegClient Service
 
 func ServiceRegInitClient(name string, info ServiceInfo) {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints: conf.AppConfig.ETCD.EndPoints,
-		DialTimeout: time.Duration(conf.AppConfig.ETCD.DailTimeout) * time.Second,
+		Endpoints: conf.AppConfig.Discovery.ETCD.EndPoints,
+		DialTimeout: time.Duration(conf.AppConfig.Discovery.ETCD.DailTimeout) * time.Second,
 	})
 	if err != nil {
 		log.SugarLogger.Error("service reg client error:", err.Error())
@@ -65,7 +65,7 @@ func (service *Service) Start() error{
 
 func (service *Service) KeepAlive() (<-chan *clientv3.LeaseKeepAliveResponse, error){
 	// 就是监控key
-	key := conf.AppConfig.ETCD.WatchPrix + service.Name
+	key := conf.AppConfig.Discovery.ETCD.WatchPrix + service.Name
 	value, _ := json.Marshal(service.Info)
 	resp, err := service.Cli.Grant(context.TODO(), 5)
 	if err != nil {
