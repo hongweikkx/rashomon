@@ -5,3 +5,6 @@ build:
 
 run:
 	./bin/${app-name}
+
+test:
+	go test -cover ./...

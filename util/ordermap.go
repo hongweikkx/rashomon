@@ -11,12 +11,12 @@ type OrderKey struct {
 }
 
 type MapOrderKeys struct {
-	sortedList []OrderKey
+	sortedList []*OrderKey
 	lessFunc   func(a, b interface{}) bool
 }
 
 type OrderMap struct {
-	sortedKeys MapOrderKeys
+	sortedKeys *MapOrderKeys
 	mapI       map[interface{}]interface{}
 }
 
@@ -26,7 +26,7 @@ type KV struct {
 }
 
 func NewOrderMap(f func(a, b interface{})bool) *OrderMap{
-	mapOrderKeys := MapOrderKeys{lessFunc: f}
+	mapOrderKeys := &MapOrderKeys{lessFunc: f}
 	orderMap := &OrderMap{sortedKeys: mapOrderKeys, mapI: make(map[interface{}]interface{})}
 	return orderMap
 }
@@ -44,14 +44,14 @@ func (om *OrderMap) Add(key interface{}, value interface{}, rankKey interface{})
 				break
 			}
 		}
-		sort.Sort(om.sortedKeys)
 	}else {
 		om.mapI[key] = value
-		om.sortedKeys.sortedList = append(om.sortedKeys.sortedList, OrderKey{
+		om.sortedKeys.sortedList = append(om.sortedKeys.sortedList, &OrderKey{
 			key:     key,
 			rankKey: rankKey,
 		})
 	}
+	sort.Sort(om.sortedKeys)
 }
 
 func (om *OrderMap) Delete(key interface{}) {
@@ -97,6 +97,6 @@ func (keys MapOrderKeys) Swap(i, j int) {
 }
 
 func (keys MapOrderKeys) Less(i, j int) bool{
-	return keys.lessFunc(keys.sortedList[i], keys.sortedList[j])
+	return keys.lessFunc(keys.sortedList[i].rankKey, keys.sortedList[j].rankKey)
 }
 

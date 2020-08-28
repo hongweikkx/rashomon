@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"github.com/hongweikkx/rashomon/load_balance"
 	"github.com/hongweikkx/rashomon/log"
 	proxygrpc "github.com/hongweikkx/rashomon/proxy/grpc"
 	proxyhttp "github.com/hongweikkx/rashomon/proxy/http"
@@ -10,21 +11,12 @@ import (
 )
 
 type Proxy struct {
-	Clusters []*Cluster
+	Clusters []*load_balance.Cluster
 	StoreCli storage.Storeage
 	HttpServer *http.Server
 	GrpcServer *grpc.Server
 }
 
-type Cluster struct {
-	Servers []*Server
-	LBStrategy int
-}
-
-type Server struct {
-	Addr string
-	Weight int
-}
 
 var ProxyIns *Proxy
 

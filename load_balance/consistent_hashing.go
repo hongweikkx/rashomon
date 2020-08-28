@@ -5,7 +5,7 @@ import (
 )
 
 type CHNode struct {
-	Address string
+	Key string
 	Num int
 }
 
@@ -22,9 +22,9 @@ func (al *ConsistentHashAL)Init() {
 }
 
 func (al *ConsistentHashAL) ADD(server Server) {
-	md5 := util.MD5INT32(server.Address)
-	al.Nodes.Add(server.Address, CHNode{
-		Address: server.Address,
+	md5 := util.MD5INT32(server.Key)
+	al.Nodes.Add(server.Key, CHNode{
+		Key: server.Key,
 		Num:     md5,
 	}, md5)
 }
@@ -33,25 +33,20 @@ func (al *ConsistentHashAL) DELETE(address string) {
 	al.Nodes.Delete(address)
 }
 
-func (al *ConsistentHashAL)GetNext(str string) int {
+func (al *ConsistentHashAL)GetNext(str string) (string, error) {
 	firstKV, err := al.Nodes.First()
 	if err != nil {
-		return -1
+		return "", err
 	}
-	address := firstKV.(util.KV).K
+	key := firstKV.(util.KV).K.(string)
 	md5 := util.MD5INT32(str)
 	for _, node := range al.Nodes.Iter() {
 		chNode := node.(util.KV).V.(CHNode)
 		if md5 < chNode.Num {
-			address = chNode.Address
+			key = chNode.Key
 			break
 		}
 	}
 
-	for k, v := range ServerPoolLB.Servers {
-		if v.Address == address {
-			return k
-		}
-	}
-	return -1
+	return key, nil
 }

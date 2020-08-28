@@ -12,11 +12,16 @@ func TestOrderMap(t *testing.T) {
 	m["c"] = "c"
 	m["d"] = "d"
 	m["e"] = "e"
+
 	orderM := NewOrderMap(func(a, b interface{}) bool {
-		return a.(string) < b.(string)
+		return a.(int) < b.(int)
 	})
 	for k, v := range m {
-		orderM.Add(k, v, k)
+		orderM.Add(k, v, MD5INT32(k))
+	}
+	for _, v := range orderM.Iter() {
+		h := v.(KV).K.(string)
+		fmt.Println("ret:", h, " ", MD5INT32(h))
 	}
 	orderM.Delete("b")
 	for _, v := range orderM.Iter() {
