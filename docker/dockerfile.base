@@ -1,0 +1,23 @@
+FROM ubuntu:16.04
+
+RUN export PATH=$PATH:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin
+
+RUN apt-get -qq update && \
+    apt-get install -y wget curl unzip build-essential
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
+
+# install go
+RUN mkdir -p /go/bin && \
+    wget -nv https://dl.google.com/go/go1.13.linux-amd64.tar.gz && \
+    tar -xvf go1.13.linux-amd64.tar.gz -C /usr/local/ && \
+    rm go1.13.linux-amd64.tar.gz
+
+ENV GOPATH=/root/go
+ENV PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+ENV GO111MODULE=on
+ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
+
