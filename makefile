@@ -23,6 +23,10 @@ stop:
 test:
 	go test -cover ./...
 
+## vendor: go mod vendor
+vendor:
+	go mod vendor
+
 help: Makefile
 	@echo
 	@echo " Choose a command run in "$(APPNAME)":"
