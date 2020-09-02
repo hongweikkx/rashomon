@@ -16,8 +16,3 @@ RUN mkdir -p /go/bin && \
     tar -xvf go1.13.linux-amd64.tar.gz -C /usr/local/ && \
     rm go1.13.linux-amd64.tar.gz
 
-ENV GOPATH=/root/go
-ENV PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
-ENV GO111MODULE=on
-ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
-
