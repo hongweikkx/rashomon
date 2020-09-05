@@ -17,12 +17,15 @@ type Dashboard struct {
 
 var DashboardIns *Dashboard
 
-func Start() {
+func Start() error{
 	if conf.IsProd() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	engine := gin.New()
-	router(engine)
+	err := router(engine)
+	if err != nil {
+		return err
+	}
 	serv := &http.Server{
 		Addr: conf.AppConfig.DashBoard.Addr,
 		Handler: engine,
@@ -33,6 +36,7 @@ func Start() {
 			log.SugarLogger.Fatal("http serv err:", err.Error())
 		}
 	}()
+	return nil
 }
 
 func Stop() {
@@ -43,8 +47,11 @@ func Stop() {
 	}
 }
 
-func router(engine *gin.Engine) {
-	authMiddleware := auth.New()
+func router(engine *gin.Engine) error{
+	authMiddleware, err := auth.New()
+	if err != nil {
+		return err
+	}
 	auth.Use(authMiddleware, engine)
 	engine.NoRoute(handleNoRoute)
 	//middleware
@@ -53,6 +60,7 @@ func router(engine *gin.Engine) {
 		ginzap.RecoveryWithZap(log.Logger, true),
 	)
 	engine.GET("/ping", handlePing)
+	return nil
 }
 
 

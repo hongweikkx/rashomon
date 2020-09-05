@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"github.com/hongweikkx/rashomon/load_balance"
-	"github.com/hongweikkx/rashomon/log"
 	proxygrpc "github.com/hongweikkx/rashomon/proxy/grpc"
 	proxyhttp "github.com/hongweikkx/rashomon/proxy/http"
 	"github.com/hongweikkx/rashomon/storage"
@@ -20,12 +19,12 @@ type Proxy struct {
 
 var ProxyIns *Proxy
 
-func Start() {
+func Start() error{
 	httpServer := proxyhttp.Start()
 	grpcServer := proxygrpc.Start()
 	storeCli, err := storage.Start()
 	if err != nil {
-		log.SugarLogger.Fatal("etcd error:", err.Error())
+		return err
 	}
 	ProxyIns = &Proxy{
 		Clusters: nil,
@@ -33,6 +32,7 @@ func Start() {
 		HttpServer: httpServer,
 		GrpcServer: grpcServer,
 	}
+	return nil
 }
 
 func Stop() {

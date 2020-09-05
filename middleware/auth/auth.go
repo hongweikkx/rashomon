@@ -1,10 +1,9 @@
 package auth
 
 import (
-	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/log"
+	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	"net/http"
 	"time"
 )
@@ -20,7 +19,7 @@ type User struct {
 	LastName  string
 }
 
-func New() *jwt.GinJWTMiddleware{
+func New() (*jwt.GinJWTMiddleware, error){
 	identityKey := "id"
 	authMiddleWare, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "name",
@@ -86,9 +85,9 @@ func New() *jwt.GinJWTMiddleware{
 
 	})
 	if err != nil {
-		log.SugarLogger.Fatal("JWT Error:", err.Error())
+		return nil, err
 	}
-	return authMiddleWare
+	return authMiddleWare, nil
 }
 
 
