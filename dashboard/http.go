@@ -2,15 +2,17 @@ package dashboard
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/middleware/auth"
-	"net/http"
-	"time"
 )
 
+// Dashboard
 type Dashboard struct {
 	Serv *http.Server
 }

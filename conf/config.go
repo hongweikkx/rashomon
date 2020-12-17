@@ -4,14 +4,17 @@ import (
 	"github.com/spf13/viper"
 )
 
-type HttpServerConf struct {
+// HTTPServerConf is http server config
+type HTTPServerConf struct {
 	Addr string
 }
 
+// GrpcServerConf is grpc server config
 type GrpcServerConf struct {
 	Addr string
 }
 
+// HystrixModelConf is hystrix config
 type HystrixModelConf struct {
 	Timeout                int
 	MaxConcurrentRequests  int
@@ -19,11 +22,13 @@ type HystrixModelConf struct {
 	ErrorPercentThreshold  int
 }
 
+// HystrixConf is hystrix config
 type HystrixConf struct {
 	Degrade HystrixModelConf
 	Fuse    HystrixModelConf
 }
 
+// ETCDConf is etcd config
 type ETCDConf struct {
 	User        string
 	Password    string
@@ -34,20 +39,24 @@ type ETCDConf struct {
 
 //Algorithm: 2   # WeightedRoundRobin = 1 / RoundRobin = 2 / consistentHashing = 3  | default = 2
 
+// ProxyConf is proxy config
 type ProxyConf struct {
-	HttpServer HttpServerConf `yaml:"HttpServer"`
+	HTTPServer HTTPServerConf `yaml:"HTTPServer"`
 	GrpcServer GrpcServerConf `yaml:"GrpcServer"`
 }
 
+// StorageConf is storage config
 type StorageConf struct {
 	Service string
 	ETCD    ETCDConf `yaml:"ETCD"`
 }
 
+// DashBoradConf is dashboard config
 type DashBoradConf struct {
 	Addr string
 }
 
+// Config is app config
 type Config struct {
 	ENV       string        `yaml:"ENV"`
 	Proxy     ProxyConf     `yaml:"Proxy"`
@@ -56,8 +65,10 @@ type Config struct {
 	Hystrix   HystrixConf   `yaml:"Hystrix"`
 }
 
+// AppConfig everything we need for app config
 var AppConfig Config
 
+// Init init config
 func Init() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -72,6 +83,7 @@ func Init() error {
 	return nil
 }
 
+// IsProd return true if app is prod
 func IsProd() bool {
 	return AppConfig.ENV == "prod"
 }
