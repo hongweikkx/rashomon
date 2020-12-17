@@ -11,15 +11,14 @@ import (
 	"time"
 )
 
-
 // todo 看看k8s的做法
-type Master struct{
-	Cli *clientv3.Client
+type Master struct {
+	Cli     *clientv3.Client
 	Members sync.Map
 }
 
 type ServiceInfo struct {
-	Ip string
+	Ip   string
 	Port string
 }
 
@@ -27,19 +26,19 @@ type Member struct {
 	EndPoint ServiceInfo
 }
 
-func New() (*Master, error){
+func New() (*Master, error) {
 	watchKey := conf.AppConfig.Storage.ETCD.WatchPrix
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   conf.AppConfig.Storage.ETCD.EndPoints,
 		DialTimeout: time.Duration(conf.AppConfig.Storage.ETCD.DailTimeout) * time.Second,
-		Username: conf.AppConfig.Storage.ETCD.User,
-		Password: conf.AppConfig.Storage.ETCD.Password,
+		Username:    conf.AppConfig.Storage.ETCD.User,
+		Password:    conf.AppConfig.Storage.ETCD.Password,
 	})
 	if err != nil {
 		return nil, err
 	}
 	// init
-	master := &Master { Cli: cli}
+	master := &Master{Cli: cli}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	res, err := cli.Get(ctx, watchKey, clientv3.WithPrefix())
@@ -55,8 +54,7 @@ func New() (*Master, error){
 	return master, nil
 }
 
-
-func (master *Master)WatchWorkers(key string) {
+func (master *Master) WatchWorkers(key string) {
 	clientv3.NewWatcher(master.Cli)
 	watchCh := master.Cli.Watch(context.Background(), key, clientv3.WithPrefix())
 	for watchMsg := range watchCh {
@@ -72,7 +70,7 @@ func (master *Master)WatchWorkers(key string) {
 	}
 }
 
-func (this *Master)Add(keyByte []byte, serviceByte []byte) {
+func (this *Master) Add(keyByte []byte, serviceByte []byte) {
 	key := string(keyByte)
 	var service ServiceInfo
 	err := json.Unmarshal(serviceByte, &service)
@@ -83,12 +81,11 @@ func (this *Master)Add(keyByte []byte, serviceByte []byte) {
 	this.Members.Store(key, service)
 }
 
-func (this *Master)Delete(keyByte []byte) {
+func (this *Master) Delete(keyByte []byte) {
 	this.Members.Delete(string(keyByte))
 }
 
-
-func (this *Master)Stop() {
+func (this *Master) Stop() {
 	err := this.Cli.Close()
 	if err != nil {
 		log.SugarLogger.Error("store cli close error:", err.Error())

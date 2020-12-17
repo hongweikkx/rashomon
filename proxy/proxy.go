@@ -2,48 +2,36 @@ package proxy
 
 import (
 	"github.com/hongweikkx/rashomon/load_balance"
-	"github.com/hongweikkx/rashomon/log"
-	proxygrpc "github.com/hongweikkx/rashomon/proxy/grpc"
-	proxyhttp "github.com/hongweikkx/rashomon/proxy/http"
 	"github.com/hongweikkx/rashomon/storage"
+	"github.com/valyala/fasthttp"
 	"google.golang.org/grpc"
-	"net/http"
 )
 
 type Proxy struct {
-	Clusters []*load_balance.Cluster
-	StoreCli storage.Storeage
-	HttpServer *http.Server
+	Clusters   []*load_balance.Cluster
+	StoreCli   storage.Storeage
+	HttpServer *fasthttp.Server
 	GrpcServer *grpc.Server
 }
 
-
 var ProxyIns *Proxy
 
-func Start() {
-	httpServer := proxyhttp.Start()
-	grpcServer := proxygrpc.Start()
+func Start() error {
 	storeCli, err := storage.Start()
 	if err != nil {
-		log.SugarLogger.Fatal("etcd error:", err.Error())
+		return err
 	}
 	ProxyIns = &Proxy{
 		Clusters: nil,
 		StoreCli: storeCli,
-		HttpServer: httpServer,
-		GrpcServer: grpcServer,
 	}
+	ProxyIns.HttpServer = ProxyIns.StartHttp()
+	ProxyIns.GrpcServer = ProxyIns.StartGRPC()
+	return nil
 }
 
 func Stop() {
-	proxyhttp.Stop(ProxyIns.HttpServer)
-	proxygrpc.Stop(ProxyIns.GrpcServer)
+	ProxyIns.StopGRPC()
+	ProxyIns.StopHttp()
 	ProxyIns.StoreCli.Stop()
 }
-
-
-
-
-
-
-

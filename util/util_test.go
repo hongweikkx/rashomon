@@ -12,10 +12,9 @@ func TestMD5INT(t *testing.T) {
 }
 
 func TestIntArrDelete(t *testing.T) {
-	arr := []int{1,2,3}
+	arr := []int{1, 2, 3}
 	IntArrDelete(&arr, 0)
 	if arr[0] != 2 || arr[1] != 3 {
 		t.Errorf("err:%d", arr)
 	}
 }
-

@@ -1,4 +1,4 @@
-package proxygrpc
+package proxy
 
 import (
 	"github.com/hongweikkx/rashomon/conf"
@@ -7,7 +7,7 @@ import (
 	"net"
 )
 
-func Start() *grpc.Server{
+func (proxy *Proxy) StartGRPC() *grpc.Server {
 	lis, err := net.Listen("tcp", conf.AppConfig.Proxy.GrpcServer.Addr)
 	if err != nil {
 		panic("grpc server panic:" + err.Error())
@@ -21,6 +21,6 @@ func Start() *grpc.Server{
 	return s
 }
 
-func Stop(s *grpc.Server) {
-	s.Stop()
+func (proxy *Proxy) StopGRPC() {
+	proxy.GrpcServer.Stop()
 }

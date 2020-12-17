@@ -19,7 +19,10 @@ func main() {
 		return
 	}
 	// proxy
-	proxy.Start()
+	err = proxy.Start()
+	if err != nil {
+		log.SugarLogger.Fatal("proxy err:", err.Error())
+	}
 	// dashboard
 	dashboard.Start()
 	log.SugarLogger.Info("server started...")

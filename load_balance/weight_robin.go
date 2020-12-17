@@ -6,8 +6,8 @@ import (
 )
 
 type WNode struct {
-	Key string
-	Weight int
+	Key           string
+	Weight        int
 	CurrentWeight int
 }
 
@@ -26,16 +26,16 @@ func (al *WeightedRoundRobinAL) DELETE(key string) {
 	for k, v := range al.Nodes {
 		if v.Key == key {
 			l := len(al.Nodes)
-			if k == l -1 {
+			if k == l-1 {
 				al.Nodes = al.Nodes[:l-1]
-			}else {
+			} else {
 				al.Nodes = append(al.Nodes[:k], al.Nodes[k+1:]...)
 			}
 		}
 	}
 }
 
-func (al *WeightedRoundRobinAL)GetNext(_str string) (string, error){
+func (al *WeightedRoundRobinAL) GetNext(_str string) (string, error) {
 	if len(al.Nodes) <= 0 {
 		return "", errors.New("no valid server to use")
 	}

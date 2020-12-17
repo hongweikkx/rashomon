@@ -18,8 +18,8 @@ func TestConsistentHashAL(t *testing.T) {
 		}, md5)
 	}
 	w := &ConsistentHashAL{Nodes: orderM}
-	res := []string{"d","c", "a", "e", "b"}
-	for i := 0; i< len(keys); i++ {
+	res := []string{"d", "c", "a", "e", "b"}
+	for i := 0; i < len(keys); i++ {
 		a, err := w.GetNext(keys[i])
 		if err != nil {
 			t.Error("TestWeightedRoundRobinAL:", err.Error())

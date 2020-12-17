@@ -25,7 +25,7 @@ type KV struct {
 	V interface{}
 }
 
-func NewOrderMap(f func(a, b interface{})bool) *OrderMap{
+func NewOrderMap(f func(a, b interface{}) bool) *OrderMap {
 	mapOrderKeys := &MapOrderKeys{lessFunc: f}
 	orderMap := &OrderMap{sortedKeys: mapOrderKeys, mapI: make(map[interface{}]interface{})}
 	return orderMap
@@ -35,7 +35,7 @@ func (om *OrderMap) Len() int {
 	return len(om.mapI)
 }
 
-func (om *OrderMap) Add(key interface{}, value interface{}, rankKey interface{}){
+func (om *OrderMap) Add(key interface{}, value interface{}, rankKey interface{}) {
 	if _, ok := om.mapI[key]; ok {
 		om.mapI[key] = value
 		for k, v := range om.sortedKeys.sortedList {
@@ -44,7 +44,7 @@ func (om *OrderMap) Add(key interface{}, value interface{}, rankKey interface{})
 				break
 			}
 		}
-	}else {
+	} else {
 		om.mapI[key] = value
 		om.sortedKeys.sortedList = append(om.sortedKeys.sortedList, &OrderKey{
 			key:     key,
@@ -60,9 +60,9 @@ func (om *OrderMap) Delete(key interface{}) {
 		for k, v := range om.sortedKeys.sortedList {
 			if v.key == key {
 				l := len(om.sortedKeys.sortedList)
-				if k == l -1 {
+				if k == l-1 {
 					om.sortedKeys.sortedList = om.sortedKeys.sortedList[:l-1]
-				}else {
+				} else {
 					om.sortedKeys.sortedList = append(om.sortedKeys.sortedList[:k], om.sortedKeys.sortedList[k+1:]...)
 				}
 				break
@@ -71,10 +71,10 @@ func (om *OrderMap) Delete(key interface{}) {
 	}
 }
 
-func (om *OrderMap) Iter() []interface{}{
+func (om *OrderMap) Iter() []interface{} {
 	ret := []interface{}{}
 	for _, v := range om.sortedKeys.sortedList {
-		ret = append(ret, KV{v.key,om.mapI[v.key]})
+		ret = append(ret, KV{v.key, om.mapI[v.key]})
 	}
 	return ret
 }
@@ -84,11 +84,11 @@ func (om *OrderMap) First() (interface{}, error) {
 		return nil, errors.New("order map is nil")
 	}
 	key := om.sortedKeys.sortedList[0].key
-	return KV{K:key, V:om.mapI[key]}, nil
+	return KV{K: key, V: om.mapI[key]}, nil
 
 }
 
-func (keys MapOrderKeys) Len() int{
+func (keys MapOrderKeys) Len() int {
 	return len(keys.sortedList)
 }
 
@@ -96,7 +96,6 @@ func (keys MapOrderKeys) Swap(i, j int) {
 	keys.sortedList[i], keys.sortedList[j] = keys.sortedList[j], keys.sortedList[i]
 }
 
-func (keys MapOrderKeys) Less(i, j int) bool{
+func (keys MapOrderKeys) Less(i, j int) bool {
 	return keys.lessFunc(keys.sortedList[i].rankKey, keys.sortedList[j].rankKey)
 }
-

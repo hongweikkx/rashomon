@@ -23,11 +23,11 @@ func TestWeightedRoundRobinAL(t *testing.T) {
 	nodes := []WNode{nodes2, nodes1, nodes3}
 	w := WeightedRoundRobinAL{Nodes: nodes}
 	res := []string{"a", "a", "b", "a", "c", "a", "a", "a", "a", "b"}
-	for i := 0; i< 10; i++ {
+	for i := 0; i < 10; i++ {
 		a, err := w.GetNext("")
 		if err != nil {
 			t.Error("TestWeightedRoundRobinAL:", err.Error())
-		}else if a != res[i] {
+		} else if a != res[i] {
 			t.Error("TestWeightedRoundRobinAL", a)
 		}
 	}

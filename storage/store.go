@@ -14,7 +14,7 @@ type Storeage interface {
 	Stop()
 }
 
-func Start() (Storeage, error){
+func Start() (Storeage, error) {
 	// 应该是每个proxy有个etcd
 	switch conf.AppConfig.Storage.Service {
 	case "etcd":
@@ -24,4 +24,3 @@ func Start() (Storeage, error){
 		return nil, errors.New("disovery do not support:" + conf.AppConfig.Storage.Service)
 	}
 }
-

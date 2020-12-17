@@ -24,7 +24,7 @@ func Start() {
 	engine := gin.New()
 	router(engine)
 	serv := &http.Server{
-		Addr: conf.AppConfig.DashBoard.Addr,
+		Addr:    conf.AppConfig.DashBoard.Addr,
 		Handler: engine,
 	}
 	DashboardIns = &Dashboard{Serv: serv}
@@ -55,7 +55,6 @@ func router(engine *gin.Engine) {
 	engine.GET("/ping", handlePing)
 }
 
-
 func handlePing(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
@@ -65,4 +64,3 @@ func handlePing(c *gin.Context) {
 func handleNoRoute(c *gin.Context) {
 	c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 }
-

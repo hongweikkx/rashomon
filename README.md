@@ -25,7 +25,8 @@ run: make run
 
 
 ## todo
+协议代理怎么做, 怎么路由？
 组装：负载均衡和服务发现和gin
-单测: load balance 各个算法。 etcd的服务发现。
+单测: etcd的服务发现。
 vue
 想想会发生什么问题呢？怎么解决呢？ 

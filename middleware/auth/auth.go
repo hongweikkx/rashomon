@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/log"
+	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	"net/http"
 	"time"
 )
@@ -20,7 +20,7 @@ type User struct {
 	LastName  string
 }
 
-func New() *jwt.GinJWTMiddleware{
+func New() *jwt.GinJWTMiddleware {
 	identityKey := "id"
 	authMiddleWare, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "name",
@@ -64,9 +64,9 @@ func New() *jwt.GinJWTMiddleware{
 			}
 			return false
 		},
-		Unauthorized: func(c * gin.Context, code int, message string) {
+		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{
-				"code": code,
+				"code":    code,
 				"message": message,
 			})
 		},
@@ -78,19 +78,17 @@ func New() *jwt.GinJWTMiddleware{
 		// - "query:<name>"
 		// - "cookie:<name>"
 		// - "param:<name>"
-		TokenLookup:  "header: Authorization, query: token, cookie: jwt",
+		TokenLookup: "header: Authorization, query: token, cookie: jwt",
 		// TokenHeadName is a string in the header. Default value is "Bearer"
 		TokenHeadName: "Bearer",
 		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
 		TimeFunc: time.Now,
-
 	})
 	if err != nil {
 		log.SugarLogger.Fatal("JWT Error:", err.Error())
 	}
 	return authMiddleWare
 }
-
 
 func Use(authMiddleware *jwt.GinJWTMiddleware, engine *gin.Engine) {
 	// 404
@@ -108,6 +106,6 @@ func Use(authMiddleware *jwt.GinJWTMiddleware, engine *gin.Engine) {
 
 func helloHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message" : "hello, world!",
+		"message": "hello, world!",
 	})
 }

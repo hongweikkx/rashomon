@@ -11,9 +11,10 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/spf13/viper v1.7.1
+	github.com/valyala/fasthttp v1.16.0
 	go.etcd.io/etcd v3.3.24+incompatible
 	go.uber.org/zap v1.15.0
-	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc
+	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
 	google.golang.org/grpc v1.21.1
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )

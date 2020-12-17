@@ -14,8 +14,8 @@ type ConsistentHashAL struct {
 	Nodes *util.OrderMap
 }
 
-func (al *ConsistentHashAL)Init() {
-	nodes := util.NewOrderMap(func(a, b interface{}) bool{
+func (al *ConsistentHashAL) Init() {
+	nodes := util.NewOrderMap(func(a, b interface{}) bool {
 		return a.(int) < b.(int)
 	})
 	al.Nodes = nodes
@@ -25,7 +25,7 @@ func (al *ConsistentHashAL) ADD(server Server) {
 	md5 := util.MD5INT32(server.Key)
 	al.Nodes.Add(server.Key, CHNode{
 		Key: server.Key,
-		Num:     md5,
+		Num: md5,
 	}, md5)
 }
 
@@ -33,7 +33,7 @@ func (al *ConsistentHashAL) DELETE(address string) {
 	al.Nodes.Delete(address)
 }
 
-func (al *ConsistentHashAL)GetNext(str string) (string, error) {
+func (al *ConsistentHashAL) GetNext(str string) (string, error) {
 	firstKV, err := al.Nodes.First()
 	if err != nil {
 		return "", err

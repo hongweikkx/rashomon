@@ -13,24 +13,23 @@ type GrpcServerConf struct {
 }
 
 type HystrixModelConf struct {
-	Timeout int
-	MaxConcurrentRequests int
+	Timeout                int
+	MaxConcurrentRequests  int
 	RequestVolumeThreshold int
-	ErrorPercentThreshold int
+	ErrorPercentThreshold  int
 }
 
 type HystrixConf struct {
 	Degrade HystrixModelConf
-	Fuse HystrixModelConf
+	Fuse    HystrixModelConf
 }
 
-
 type ETCDConf struct {
-	User string
-	Password string
-	EndPoints []string
+	User        string
+	Password    string
+	EndPoints   []string
 	DailTimeout int
-	WatchPrix string
+	WatchPrix   string
 }
 
 //Algorithm: 2   # WeightedRoundRobin = 1 / RoundRobin = 2 / consistentHashing = 3  | default = 2
@@ -42,7 +41,7 @@ type ProxyConf struct {
 
 type StorageConf struct {
 	Service string
-	ETCD ETCDConf `yaml:"ETCD"`
+	ETCD    ETCDConf `yaml:"ETCD"`
 }
 
 type DashBoradConf struct {
@@ -50,16 +49,16 @@ type DashBoradConf struct {
 }
 
 type Config struct {
-	ENV   string    `yaml:"ENV"`
-	Proxy ProxyConf `yaml:"Proxy"`
+	ENV       string        `yaml:"ENV"`
+	Proxy     ProxyConf     `yaml:"Proxy"`
 	DashBoard DashBoradConf `yaml:"DashBoard"`
-	Storage StorageConf `yaml:"Storage"`
-	Hystrix HystrixConf `yaml:"Hystrix"`
+	Storage   StorageConf   `yaml:"Storage"`
+	Hystrix   HystrixConf   `yaml:"Hystrix"`
 }
 
 var AppConfig Config
 
-func Init() error{
+func Init() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./conf")
@@ -73,6 +72,6 @@ func Init() error{
 	return nil
 }
 
-func IsProd() bool{
+func IsProd() bool {
 	return AppConfig.ENV == "prod"
 }

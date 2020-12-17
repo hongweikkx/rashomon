@@ -9,16 +9,16 @@ import (
 
 func init() {
 	hystrix.ConfigureCommand("degrade", hystrix.CommandConfig{
-		Timeout:               conf.AppConfig.Hystrix.Degrade.Timeout,
-		MaxConcurrentRequests: conf.AppConfig.Hystrix.Degrade.MaxConcurrentRequests,
+		Timeout:                conf.AppConfig.Hystrix.Degrade.Timeout,
+		MaxConcurrentRequests:  conf.AppConfig.Hystrix.Degrade.MaxConcurrentRequests,
 		RequestVolumeThreshold: conf.AppConfig.Hystrix.Degrade.RequestVolumeThreshold,
-		ErrorPercentThreshold: conf.AppConfig.Hystrix.Degrade.ErrorPercentThreshold,
+		ErrorPercentThreshold:  conf.AppConfig.Hystrix.Degrade.ErrorPercentThreshold,
 	})
 	hystrix.ConfigureCommand("fuse", hystrix.CommandConfig{
-		Timeout:               conf.AppConfig.Hystrix.Fuse.Timeout,
-		MaxConcurrentRequests: conf.AppConfig.Hystrix.Fuse.MaxConcurrentRequests,
+		Timeout:                conf.AppConfig.Hystrix.Fuse.Timeout,
+		MaxConcurrentRequests:  conf.AppConfig.Hystrix.Fuse.MaxConcurrentRequests,
 		RequestVolumeThreshold: conf.AppConfig.Hystrix.Fuse.RequestVolumeThreshold,
-		ErrorPercentThreshold: conf.AppConfig.Hystrix.Fuse.ErrorPercentThreshold,
+		ErrorPercentThreshold:  conf.AppConfig.Hystrix.Fuse.ErrorPercentThreshold,
 	})
 }
 
@@ -39,10 +39,8 @@ func HandleDegrade(c *gin.Context) {
 	}, func(err error) error {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
-			"status": "service degrade",
+			"status":  "service degrade",
 		})
 		return nil
 	})
 }
-
-
