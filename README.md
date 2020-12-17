@@ -23,6 +23,9 @@ beego vs gin: 选择gin。 因为不需要MVC架构。 GIN 可以满足需求。
 build: make build
 run: make run
 
+## docker image
+base image: registry.cn-hangzhou.aliyuncs.com/hongweigao/rashomon_base
+
 
 ## todo
 协议代理怎么做, 怎么路由？

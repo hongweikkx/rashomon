@@ -24,7 +24,10 @@ func main() {
 		log.SugarLogger.Fatal("proxy err:", err.Error())
 	}
 	// dashboard
-	dashboard.Start()
+	err = dashboard.Start()
+	if err != nil {
+		log.SugarLogger.Fatal("dashboard err:", err.Error())
+	}
 	log.SugarLogger.Info("server started...")
 	// wait to stop
 	quit := make(chan os.Signal, 1)

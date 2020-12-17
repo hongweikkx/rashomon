@@ -32,5 +32,4 @@ func (proxy *Proxy) StopHttp() {
 func (p *Proxy) SrvHTTP(ctx *fasthttp.RequestCtx) {
 	// 分析ctx的url
 	//
-
 }

@@ -43,7 +43,6 @@ func New() (*Master, error) {
 	defer cancel()
 	res, err := cli.Get(ctx, watchKey, clientv3.WithPrefix())
 	if err != nil {
-		log.SugarLogger.Fatal("etcd server start error:", err.Error())
 		return nil, err
 	}
 	for _, v := range res.Kvs {

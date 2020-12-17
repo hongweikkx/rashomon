@@ -18,15 +18,17 @@ var ProxyIns *Proxy
 
 func Start() error {
 	storeCli, err := storage.Start()
+	httpServer := ProxyIns.StartHttp()
+	grpcServer := ProxyIns.StartGRPC()
 	if err != nil {
 		return err
 	}
 	ProxyIns = &Proxy{
-		Clusters: nil,
-		StoreCli: storeCli,
+		Clusters:   nil,
+		StoreCli:   storeCli,
+		HttpServer: httpServer,
+		GrpcServer: grpcServer,
 	}
-	ProxyIns.HttpServer = ProxyIns.StartHttp()
-	ProxyIns.GrpcServer = ProxyIns.StartGRPC()
 	return nil
 }
 
