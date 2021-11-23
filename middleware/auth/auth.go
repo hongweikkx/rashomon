@@ -1,12 +1,22 @@
 package auth
 
 import (
+	"fmt"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/middleware/hystrix"
 	"net/http"
 	"time"
 )
+
+var AuthMiddleWare *jwt.GinJWTMiddleware
+
+func init() {
+	var err error
+	AuthMiddleWare, err = New()
+	if err != nil {
+		panic(fmt.Sprintf("dashboard auth middle err:%+v", err))
+	}
+}
 
 type login struct {
 	Username string `form:"username" json:"username" binding:"required"`
@@ -14,9 +24,7 @@ type login struct {
 }
 
 type User struct {
-	UserName  string
-	FirstName string
-	LastName  string
+	Id string
 }
 
 func New() (*jwt.GinJWTMiddleware, error) {
@@ -24,13 +32,13 @@ func New() (*jwt.GinJWTMiddleware, error) {
 	authMiddleWare, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "name",
 		Key:         []byte("secret key"),
-		Timeout:     time.Minute * 10,
+		Timeout:     time.Minute * 60,
 		MaxRefresh:  time.Minute * 10,
 		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
-					identityKey: v.UserName,
+					identityKey: v.Id,
 				}
 			}
 			return jwt.MapClaims{}
@@ -38,37 +46,19 @@ func New() (*jwt.GinJWTMiddleware, error) {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			calims := jwt.ExtractClaims(c)
 			return &User{
-				UserName: calims[identityKey].(string),
+				Id: calims[identityKey].(string),
 			}
 		},
-		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var loginVals login
-			if err := c.ShouldBind(&loginVals); err != nil {
-				return "", jwt.ErrMissingLoginValues
-			}
-			userId := loginVals.Username
-			password := loginVals.Password
-			if (userId == "admin" && password == "admin") || (userId == "test" && password == "test") {
-				return &User{
-					UserName:  userId,
-					LastName:  "hongwei",
-					FirstName: "gao",
-				}, nil
-			}
-			return nil, jwt.ErrFailedAuthentication
-		},
-		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*User); ok && v.UserName == "admin" {
-				return true
-			}
-			return false
-		},
+		Authenticator: authenticator,
 		Unauthorized: func(c *gin.Context, code int, message string) {
-			c.JSON(code, gin.H{
-				"code":    code,
+			c.JSON(http.StatusOK, gin.H{
+				"code":    40100,
 				"message": message,
 			})
 		},
+		LoginResponse: loginResponse,
+		LogoutResponse: logoutResponse,
+		RefreshResponse: loginResponse,
 		// TokenLookup is a string in the form of "<source>:<name>" that is used
 		// to extract token from the request.
 		// Optional. Default value "header:Authorization".
@@ -89,22 +79,35 @@ func New() (*jwt.GinJWTMiddleware, error) {
 	return authMiddleWare, nil
 }
 
-func Use(authMiddleware *jwt.GinJWTMiddleware, engine *gin.Engine) {
-	// 404
-	engine.NoRoute(authMiddleware.MiddlewareFunc())
-	// auth group
-	authGroup := engine.Group("/auth")
-	// Refresh time can be longer than token timeout
-	authGroup.GET("/refresh_token", authMiddleware.RefreshHandler)
-	authGroup.Use(authMiddleware.MiddlewareFunc())
-	{
-		authGroup.GET("/hello", hystrix.HandleDegrade, helloHandler)
+
+func authenticator(c *gin.Context) (interface{}, error){
+	var loginVals login
+	if err := c.ShouldBind(&loginVals); err != nil {
+		return "", jwt.ErrMissingLoginValues
 	}
-	engine.POST("/login", authMiddleware.LoginHandler)
+	userId := loginVals.Username
+	password := loginVals.Password
+	if userId == "admin" && password == "123456" {
+		return &User{
+			Id:  "100000",
+		}, nil
+	}
+	return nil, jwt.ErrFailedAuthentication
 }
 
-func helloHandler(c *gin.Context) {
+func loginResponse(c *gin.Context, code int, token string, expire time.Time) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "hello, world!",
+		"code": 20000,
+		"data": gin.H{
+			"token": token,
+			"expires": expire.Format(time.RFC3339),
+		},
+	})
+}
+
+func logoutResponse(c *gin.Context, code int) {
+	c.JSON(http.StatusOK, gin.H{
+		"code": 20000,
+		"data": "success",
 	})
 }

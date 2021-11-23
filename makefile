@@ -11,7 +11,7 @@ build:
 	go build -o bin/${APPNAME} .
 
 ## run: run the app
-run:
+run: build
 	./bin/${APPNAME}
 
 ## stop : stop the app

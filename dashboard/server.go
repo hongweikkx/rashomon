@@ -2,14 +2,13 @@ package dashboard
 
 import (
 	"context"
+	"github.com/hongweikkx/rashomon/dashboard/route"
 	"net/http"
 	"time"
 
-	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
-	"github.com/hongweikkx/rashomon/middleware/auth"
 )
 
 // Dashboard
@@ -24,7 +23,7 @@ func Start() error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	engine := gin.New()
-	err := router(engine)
+	err := route.Router(engine)
 	if err != nil {
 		return err
 	}
@@ -49,28 +48,3 @@ func Stop() {
 	}
 }
 
-func router(engine *gin.Engine) error {
-	authMiddleware, err := auth.New()
-	if err != nil {
-		return err
-	}
-	auth.Use(authMiddleware, engine)
-	engine.NoRoute(handleNoRoute)
-	//middleware
-	engine.Use(
-		ginzap.Ginzap(log.Logger, time.RFC3339, true),
-		ginzap.RecoveryWithZap(log.Logger, true),
-	)
-	engine.GET("/ping", handlePing)
-	return nil
-}
-
-func handlePing(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "pong",
-	})
-}
-
-func handleNoRoute(c *gin.Context) {
-	c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
-}

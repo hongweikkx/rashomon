@@ -5,7 +5,7 @@ Proxy:
   GrpcServer:
     Addr: ":9091"
 DashBoard:
-    Addr: ":8080"
+    Addr: ":8000"
 Storage:
   Service: "etcd"
   ETCD:
