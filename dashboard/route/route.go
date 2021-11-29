@@ -19,7 +19,7 @@ func Router(engine *gin.Engine) error {
 		ginzap.RecoveryWithZap(log.Logger, true),
 	)
 
-	v1 := engine.Group("/v1")
+	v1 := engine.Group("/v1/dashboard")
 	v1.POST("/user/login", auth.AuthMiddleWare.LoginHandler)
 	v1.POST("/user/logout",auth.AuthMiddleWare.MiddlewareFunc(), auth.AuthMiddleWare.LogoutHandler)
 	v1.POST("/user/refresh_token", auth.AuthMiddleWare.MiddlewareFunc(), auth.AuthMiddleWare.RefreshHandler)

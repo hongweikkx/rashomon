@@ -44,7 +44,7 @@ func Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := DashboardIns.Serv.Shutdown(ctx); err != nil {
-		log.SugarLogger.Info("http server forced to shutdown:", err)
+		log.SugarLogger.Info("[dasboard] http server forced to shutdown:", err)
 	}
 }
 

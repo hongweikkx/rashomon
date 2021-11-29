@@ -2,8 +2,6 @@ ENV: "beta"
 Proxy:
   HttpServer:
     Addr: ":9090"
-  GrpcServer:
-    Addr: ":9091"
 DashBoard:
     Addr: ":8000"
 Storage:
