@@ -4,16 +4,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// HTTPServerConf is http server config
-type HTTPServerConf struct {
-	Addr string
-}
-
-// GrpcServerConf is grpc server config
-type GrpcServerConf struct {
-	Addr string
-}
-
 // HystrixModelConf is hystrix config
 type HystrixModelConf struct {
 	Timeout                int
@@ -28,59 +18,33 @@ type HystrixConf struct {
 	Fuse    HystrixModelConf
 }
 
-// ETCDConf is etcd config
-type ETCDConf struct {
-	User        string
-	Password    string
-	EndPoints   []string
-	DailTimeout int
-	WatchPrix   string
-}
-
-//Algorithm: 2   # WeightedRoundRobin = 1 / RoundRobin = 2 / consistentHashing = 3  | default = 2
-
-// ProxyConf is proxy config
-type ProxyConf struct {
-	HTTPServer HTTPServerConf `yaml:"HTTPServer"`
-	GrpcServer GrpcServerConf `yaml:"GrpcServer"`
-}
-
-// StorageConf is storage config
-type StorageConf struct {
-	Service string
-	ETCD    ETCDConf `yaml:"ETCD"`
-}
-
 // DashBoradConf is dashboard config
 type DashBoradConf struct {
-	Addr string
 }
 
 // Config is app config
 type Config struct {
-	ENV       string        `yaml:"ENV"`
-	Proxy     ProxyConf     `yaml:"Proxy"`
-	DashBoard DashBoradConf `yaml:"DashBoard"`
-	Storage   StorageConf   `yaml:"Storage"`
-	Hystrix   HystrixConf   `yaml:"Hystrix"`
+	ENV       string      `yaml:"ENV"`
+	Addr      string      `yaml:"Addr"`
+	RedisHost string      `yaml:"RedisHost"`
+	Hystrix   HystrixConf `yaml:"Hystrix"`
 }
 
 // AppConfig everything we need for app config
 var AppConfig Config
 
 // Init init config
-func Init() error {
+func init() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./conf")
 	if err := viper.ReadInConfig(); err != nil {
-		return err
+		panic(err)
 	}
 	err := viper.Unmarshal(&AppConfig)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	return nil
 }
 
 // IsProd return true if app is prod

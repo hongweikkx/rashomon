@@ -1,18 +1,6 @@
 ENV: "beta"
-Proxy:
-  HttpServer:
-    Addr: ":9090"
-DashBoard:
-    Addr: ":8000"
-Storage:
-  Service: "etcd"
-  ETCD:
-    UserName: "user"
-    Password: "password"
-    WatchPrix: "service/"
-    EndPoints:
-      - "localhost:2379"
-    DailTimeout: 5   #
+Addr: ":8000"
+RedisHost: "localhost:6379"
 Hystrix:
   Degrade:
     Timeout: 100000

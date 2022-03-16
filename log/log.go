@@ -7,12 +7,7 @@ import (
 var SugarLogger *zap.SugaredLogger
 var Logger *zap.Logger
 
-func Init() {
+func init() {
 	Logger, _ = zap.NewProduction()
 	SugarLogger = Logger.Sugar()
-}
-
-func Stop() {
-	Logger.Sync()
-	SugarLogger.Sync()
 }
