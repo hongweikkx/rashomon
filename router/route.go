@@ -20,11 +20,20 @@ func Router(engine *gin.Engine) {
 		ginzap.RecoveryWithZap(log.Logger, true),
 	)
 
-	v1 := engine.Group("/v1")
-	v1.POST("/user/login", auth.AuthMiddleWare.LoginHandler)
-	v1.POST("/user/logout", auth.AuthMiddleWare.MiddlewareFunc(), auth.AuthMiddleWare.LogoutHandler)
-	v1.POST("/user/refresh_token", auth.AuthMiddleWare.MiddlewareFunc(), auth.AuthMiddleWare.RefreshHandler)
-	v1.GET("/user/info", auth.AuthMiddleWare.MiddlewareFunc(), handle.UserInfo)
-	v1.GET("/table/list", auth.AuthMiddleWare.MiddlewareFunc(), handle.TableList)
-	v1.GET("/answer/recommend", auth.AuthMiddleWare.MiddlewareFunc(), handle.AnswerList)
+	v1 := engine.Group("v1")
+
+	userR := v1.Group("user")
+	userR.POST("login", auth.AuthMiddleWare.LoginHandler)
+	userR.POST("logout", auth.AuthMiddleWare.MiddlewareFunc(), auth.AuthMiddleWare.LogoutHandler)
+	userR.POST("refresh_token", auth.AuthMiddleWare.MiddlewareFunc(), auth.AuthMiddleWare.RefreshHandler)
+	userR.GET("info", auth.AuthMiddleWare.MiddlewareFunc(), handle.UserInfo)
+
+	answerR := v1.Group("answer", auth.AuthMiddleWare.MiddlewareFunc())
+	answerR.GET("recommend", handle.AnswerList)
+	answerR.GET("likelist", handle.LikeList)
+	answerR.POST("like", handle.Like)
+	answerR.POST("search", handle.Search)
+
+	toolR := v1.Group("tool", auth.AuthMiddleWare.MiddlewareFunc())
+	toolR.GET("list", handle.ToolList)
 }

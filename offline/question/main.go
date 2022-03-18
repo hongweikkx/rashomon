@@ -1,10 +1,11 @@
 package main
 
 type Answer struct {
-	Id        string `json:"id"`
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	OriginUrl string `json:"originUrl"`
+	Id        string
+	Title     string
+	Content   string
+	OriginUrl string
+	VoteUp    string
 }
 
 func main() {
@@ -24,5 +25,7 @@ func (ans *Answer) Format() map[string]interface{} {
 		"title":     ans.Title,
 		"content":   ans.Content,
 		"originUrl": ans.OriginUrl,
+		"voteUp":    ans.VoteUp,
+		"isLike":    "0",
 	}
 }

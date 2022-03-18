@@ -58,13 +58,20 @@ func (zh *ZH) InitData() error {
 		if err != nil {
 			continue
 		}
-		redisCli.HMSet(zh.AnswerKey(ans.Id), ans.Format())
+		pipe := redisCli.Pipeline()
+		pipe.HMSet(zh.AnswerKey(ans.Id), ans.Format())
+		pipe.SAdd(zh.AnswerAllKey(), ans.Id)
+		pipe.Exec()
 	}
 	return nil
 }
 
 func (zh *ZH) AnswerKey(id string) string {
 	return fmt.Sprintf("answer:zhihu:%s", id)
+}
+
+func (zh *ZH) AnswerAllKey() string {
+	return fmt.Sprintf("answers")
 }
 
 func (zh *ZH) GetAnswer(url string) (*Answer, error) {
@@ -83,6 +90,14 @@ func (zh *ZH) GetAnswer(url string) (*Answer, error) {
 		fmt.Printf("err:%+v\n", err)
 		return nil, err
 	}
+	voteUp := ""
+	doc.Find("button").EachWithBreak(func(i int, selection *goquery.Selection) bool {
+		if strings.Contains(selection.Text(), "赞同") {
+			voteUp = selection.Text()[10:]
+			return false
+		}
+		return true
+	})
 	title := doc.Find("title").Contents().Text()
 	content := doc.Find("p").Contents().Text()
 	if title == "" || content == "" {
@@ -93,6 +108,7 @@ func (zh *ZH) GetAnswer(url string) (*Answer, error) {
 		Title:     title,
 		Content:   content,
 		OriginUrl: url,
+		VoteUp:    voteUp,
 	}, nil
 }
 
