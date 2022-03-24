@@ -67,7 +67,6 @@ func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx conte
 		doneCh <- err == nil
 	}()
 	done := <-doneCh
-	panic("")
 	if !done {
 		status, res = degradeF()
 	}
