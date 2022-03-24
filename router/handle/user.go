@@ -16,25 +16,3 @@ func UserInfo(c *gin.Context) {
 		},
 	})
 }
-
-type User struct {
-	Id     string `json:"id"`
-	Title  string `json:"title"`
-	Status string `json:"status"`
-}
-
-func TableList(c *gin.Context) {
-	c.JSON(200, map[string]interface{}{
-		"code": 20000,
-		"data": map[string]interface{}{
-			"total": 1,
-			"items": []User{
-				{
-					Id:     "1",
-					Title:  "1",
-					Status: "deleted",
-				},
-			},
-		},
-	})
-}

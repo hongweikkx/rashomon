@@ -15,7 +15,6 @@ type HystrixModelConf struct {
 // HystrixConf is hystrix config
 type HystrixConf struct {
 	Degrade HystrixModelConf
-	Fuse    HystrixModelConf
 }
 
 // DashBoradConf is dashboard config

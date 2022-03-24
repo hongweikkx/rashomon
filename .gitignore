@@ -17,3 +17,4 @@ vendor/
 bin
 default.etcd
 rashomon
+offline/question/question

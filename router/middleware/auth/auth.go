@@ -1,4 +1,4 @@
-package auth
+package modAuth
 
 import (
 	"fmt"
@@ -9,13 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AuthMiddleWare *jwt.GinJWTMiddleware
+var AuthIns auth
+
+type auth struct {
+	*jwt.GinJWTMiddleware
+}
 
 func init() {
-	var err error
-	AuthMiddleWare, err = New()
+	AuthMiddleWare, err := New()
 	if err != nil {
 		panic(fmt.Sprintf("dashboard auth middle err:%+v", err))
+	}
+	AuthIns = auth{
+		AuthMiddleWare,
 	}
 }
 
@@ -85,9 +91,9 @@ func authenticator(c *gin.Context) (interface{}, error) {
 	if err := c.ShouldBind(&loginVals); err != nil {
 		return "", jwt.ErrMissingLoginValues
 	}
-	userId := loginVals.Username
+	userName := loginVals.Username
 	password := loginVals.Password
-	if userId == "admin" && password == "123456" {
+	if userName == "admin" && password == "123456" {
 		return &User{
 			Id: "100000",
 		}, nil
@@ -110,4 +116,8 @@ func logoutResponse(c *gin.Context, code int) {
 		"code": 20000,
 		"data": "success",
 	})
+}
+
+func (auth auth) UserAuthInfo(c *gin.Context) *User {
+	return auth.GinJWTMiddleware.IdentityHandler(c).(*User)
 }

@@ -1,7 +1,10 @@
 package handle
 
 import (
+	"context"
+
 	"github.com/gin-gonic/gin"
+	dgd "github.com/hongweikkx/rashomon/router/middleware/degrade"
 )
 
 type ToolS struct {
@@ -19,10 +22,12 @@ var DownloadTOOLS = []ToolS{
 }
 
 func ToolList(c *gin.Context) {
-	c.JSON(200, map[string]interface{}{
-		"code": 20000,
-		"data": map[string]interface{}{
-			"downloads": DownloadTOOLS,
-		},
+	dgd.Fuse(c, nil, func(ctx context.Context) (int, interface{}) {
+		return 200, map[string]interface{}{
+			"code": 20000,
+			"data": map[string]interface{}{
+				"downloads": DownloadTOOLS,
+			},
+		}
 	})
 }

@@ -1,18 +1,6 @@
 ENV: "beta"
 Addr: ":8000"
 RedisHost: "localhost:6379"
-Hystrix:
-  Degrade:
-    Timeout: 100000
-    MaxConcurrentRequests: 100
-    RequestVolumeThreshold: 10
-    ErrorPercentThreshold: 25
-  Fuse:
-    Timeout: 100000
-    MaxConcurrentRequests: 100
-    RequestVolumeThreshold: 10
-    ErrorPercentThreshold: 25
-
 
 
 
