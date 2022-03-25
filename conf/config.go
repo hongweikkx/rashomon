@@ -4,29 +4,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-// HystrixModelConf is hystrix config
-type HystrixModelConf struct {
-	Timeout                int
-	MaxConcurrentRequests  int
-	RequestVolumeThreshold int
-	ErrorPercentThreshold  int
-}
-
-// HystrixConf is hystrix config
-type HystrixConf struct {
-	Degrade HystrixModelConf
-}
-
-// DashBoradConf is dashboard config
-type DashBoradConf struct {
-}
-
 // Config is app config
 type Config struct {
-	ENV       string      `yaml:"ENV"`
-	Addr      string      `yaml:"Addr"`
-	RedisHost string      `yaml:"RedisHost"`
-	Hystrix   HystrixConf `yaml:"Hystrix"`
+	Prod      bool   `yaml:"Prod"`
+	Addr      string `yaml:"Addr"`
+	RedisHost string `yaml:"RedisHost"`
 }
 
 // AppConfig everything we need for app config
@@ -44,9 +26,4 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-// IsProd return true if app is prod
-func IsProd() bool {
-	return AppConfig.ENV == "prod"
 }

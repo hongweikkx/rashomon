@@ -5,23 +5,25 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/log"
+	"github.com/hongweikkx/rashomon/router/middleware/ctxkv"
 	dgd "github.com/hongweikkx/rashomon/router/middleware/degrade"
 	"github.com/hongweikkx/rashomon/service"
+	"go.uber.org/zap"
 )
 
 func AnswerList(c *gin.Context) {
+	logger := ctxkv.Log(c)
 	dgd.Fuse(c, nil, func(ctx context.Context) (int, interface{}) {
 		ids, err := service.RedisClient.SRandMemberN(ctx, "answers", 10).Result()
 		if err != nil {
-			log.SugarLogger.Errorf("answerlist err:%+v", err.Error())
+			logger.Error("", zap.Error(err))
 			return 500, ""
 		}
 		ress := []map[string]string{}
 		for _, id := range ids {
 			m, err := service.RedisClient.HGetAll(ctx, AnswerKey(id)).Result()
 			if err != nil {
-				log.SugarLogger.Errorf("err:%+v", err)
+				logger.Error("", zap.Error(err))
 				continue
 			}
 			ress = append(ress, m)
@@ -45,10 +47,11 @@ func Like(c *gin.Context) {
 }
 
 func Search(c *gin.Context) {
+	logger := ctxkv.Log(c)
 	dgd.Fuse(c, nil, func(ctx context.Context) (int, interface{}) {
 		ids, err := service.RedisClient.SRandMemberN(ctx, "answers", 10).Result()
 		if err != nil {
-			log.SugarLogger.Errorf("answerlist err:%+v", err.Error())
+			logger.Error("", zap.Error(err))
 			return 500, ""
 		}
 		ress := []map[string]string{}
@@ -69,10 +72,11 @@ func Search(c *gin.Context) {
 }
 
 func LikeList(c *gin.Context) {
+	logger := ctxkv.Log(c)
 	dgd.Fuse(c, nil, func(ctx context.Context) (int, interface{}) {
 		ids, err := service.RedisClient.SRandMemberN(ctx, "answers", 10).Result()
 		if err != nil {
-			log.SugarLogger.Errorf("answerlist err:%+v", err.Error())
+			logger.Error("answerlist err:%+v", zap.Error(err))
 			return 500, ""
 		}
 		ress := []map[string]string{}

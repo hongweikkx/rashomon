@@ -4,15 +4,13 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"reflect"
-	"runtime"
-	"runtime/debug"
 	"time"
 
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/log"
+	"github.com/hongweikkx/rashomon/router/middleware/ctxkv"
 	"github.com/hongweikkx/rashomon/util/enum"
+	"go.uber.org/zap"
 )
 
 const (
@@ -40,6 +38,7 @@ func Fuse(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx context.
 }
 
 func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx context.Context) (int, interface{}), degradeF func() (int, interface{})) {
+	logger := ctxkv.Log(c)
 	if conf != nil {
 		hystrix.ConfigureCommand(dgdName(c), *conf)
 	}
@@ -52,15 +51,16 @@ func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx conte
 		err := hystrix.DoC(ctx, dgdName(c), func(ctx context.Context) error {
 			defer func() {
 				if e := recover(); e != nil {
-					log.SugarLogger.Error("[RECOVER] ", e, " [STACK] ", string(debug.Stack()))
+					logger.Error("[RECOVER FROM PANIC] ",
+						zap.Any("error", e),
+						zap.String("time", time.Now().Format(time.RFC3339)),
+					)
 					doneCh <- false
 				}
 			}()
 			status, res = actionF(ctx)
 			if status != http.StatusOK {
-				log.SugarLogger.Errorf("%s: action:%s, status:%d, res:%+v", enum.ERR_GLOBAL_THIRD_PARTY,
-					runtime.FuncForPC(reflect.ValueOf(actionF).Pointer()).Name(), status, res)
-				return errors.New(enum.ERR_GLOBAL_THIRD_PARTY)
+				return errors.New(enum.ERR_GLOBAL_COMMON)
 			}
 			return nil
 		}, nil)
@@ -68,6 +68,7 @@ func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx conte
 	}()
 	done := <-doneCh
 	if !done {
+		ctxkv.SetDgd(c, true)
 		status, res = degradeF()
 	}
 	if ress, ok := res.(string); ok {

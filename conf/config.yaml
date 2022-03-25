@@ -1,4 +1,4 @@
-ENV: "beta"
+Prod: false
 Addr: ":8000"
 RedisHost: "localhost:6379"
 

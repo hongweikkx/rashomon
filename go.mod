@@ -7,10 +7,10 @@ require (
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/appleboy/gin-jwt/v2 v2.8.0
 	github.com/gin-contrib/gzip v0.0.5
-	github.com/gin-contrib/zap v0.0.2
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/google/uuid v1.3.0
 	github.com/nxadm/tail v1.4.8
 	github.com/spf13/viper v1.10.1
 	go.uber.org/zap v1.21.0

@@ -1,23 +1,20 @@
 package router
 
 import (
-	"time"
-
 	"github.com/gin-contrib/gzip"
-	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/router/handle"
 	"github.com/hongweikkx/rashomon/router/middleware/auth"
 	"github.com/hongweikkx/rashomon/router/middleware/ctxkv"
+	"github.com/hongweikkx/rashomon/router/middleware/mlog"
 	"github.com/hongweikkx/rashomon/router/middleware/rate"
 )
 
 func Router(engine *gin.Engine) {
 	engine.Use(
 		ctxkv.Bind,
-		ginzap.Ginzap(log.Logger, time.RFC3339, true),
-		ginzap.RecoveryWithZap(log.Logger, true),
+		mlog.LogMiddle,
+		mlog.RecoveryWithLog,
 		gzip.Gzip(gzip.DefaultCompression),
 	)
 
