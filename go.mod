@@ -11,6 +11,8 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.3.0
+	github.com/newrelic/go-agent/v3 v3.15.2
+	github.com/newrelic/go-agent/v3/integrations/nrgin v1.1.2
 	github.com/nxadm/tail v1.4.8
 	github.com/spf13/viper v1.10.1
 	go.uber.org/zap v1.21.0
@@ -50,6 +52,8 @@ require (
 	golang.org/x/net v0.0.0-20210916014120-12bc252f5db8 // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
+	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
+	google.golang.org/grpc v1.43.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

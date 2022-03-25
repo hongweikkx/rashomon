@@ -13,6 +13,7 @@ import (
 	"github.com/hongweikkx/rashomon/conf"
 	"github.com/hongweikkx/rashomon/log"
 	"github.com/hongweikkx/rashomon/router"
+	"github.com/hongweikkx/rashomon/service"
 )
 
 func main() {
@@ -40,6 +41,7 @@ func main() {
 	if err := serv.Shutdown(ctx); err != nil {
 		log.Logger.Info("[dasboard] http server forced to shutdown:", err)
 	}
+	service.MonitorNewRelic.Shutdown(time.Second)
 	log.Logger.Sync()
 	log.Logger.Info("server exit.")
 }

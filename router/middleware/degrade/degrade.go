@@ -13,10 +13,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	DEGRADE = "degrade"
-)
-
 func init() {
 	hystrix.DefaultErrorPercentThreshold = 40
 	hystrix.DefaultMaxConcurrent = 100

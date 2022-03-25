@@ -8,6 +8,8 @@ import (
 	"github.com/hongweikkx/rashomon/router/middleware/ctxkv"
 	"github.com/hongweikkx/rashomon/router/middleware/mlog"
 	"github.com/hongweikkx/rashomon/router/middleware/rate"
+	"github.com/hongweikkx/rashomon/service"
+	"github.com/newrelic/go-agent/v3/integrations/nrgin"
 )
 
 func Router(engine *gin.Engine) {
@@ -15,6 +17,7 @@ func Router(engine *gin.Engine) {
 		ctxkv.Bind,
 		mlog.LogMiddle,
 		mlog.RecoveryWithLog,
+		nrgin.Middleware(service.MonitorNewRelic),
 		gzip.Gzip(gzip.DefaultCompression),
 	)
 
