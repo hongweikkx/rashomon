@@ -3,8 +3,8 @@ package ctxkv
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/hongweikkx/rashomon/log"
 	"go.uber.org/zap"
+	"rashomon/pkg/logger"
 )
 
 type CtxKV struct {
@@ -19,7 +19,7 @@ func Bind(c *gin.Context) {
 	ctx := &CtxKV{}
 	ctx.PlatForm = c.GetHeader("x-platform")
 	c.Set(CTX_INFO, ctx)
-	c.Set(CTX_LOG, log.MLogger.With(zap.String("trace-id", uuid.New().String())))
+	c.Set(CTX_LOG, logger.Logger.With(zap.String("trace-id", uuid.New().String())))
 	SetDgd(c, false)
 	c.Next()
 }
@@ -35,7 +35,7 @@ func Log(c *gin.Context) *zap.Logger {
 	if value, isExist := c.Get(CTX_LOG); isExist {
 		return value.(*zap.Logger)
 	}
-	return log.MLogger
+	return logger.Logger
 }
 
 func SetDgd(c *gin.Context, dgd bool) {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"rashomon/consts"
+	"rashomon/middleware/ctxkv"
 	"time"
 
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/router/middleware/ctxkv"
-	"github.com/hongweikkx/rashomon/util/enum"
 	"go.uber.org/zap"
 )
 
@@ -56,7 +56,7 @@ func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx conte
 			}()
 			status, res = actionF(ctx)
 			if status != http.StatusOK {
-				return errors.New(enum.ERR_GLOBAL_COMMON)
+				return errors.New(consts.ERR_GLOBAL_COMMON)
 			}
 			return nil
 		}, nil)

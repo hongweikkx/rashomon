@@ -1,0 +1,3 @@
+{"level":"ERROR","time":"2024-06-28T19:31:29.343+0800","caller":"rashomon/main.go:26","msg":"failed to initialize database, got error Error 1049 (42000): Unknown database 'rashomon'"}
+{"level":"INFO","time":"2024-06-29T08:08:21.769+0800","caller":"cmd/server.go:48","msg":"server started on %+v...","addr":":5690"}
+{"level":"INFO","time":"2024-06-29T08:09:12.448+0800","caller":"cmd/server.go:59","msg":"server exit."}

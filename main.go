@@ -1,47 +1,41 @@
-//
 package main
 
 import (
-	"context"
-	"net/http"
+	"fmt"
+	"github.com/spf13/cobra"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/conf"
-	"github.com/hongweikkx/rashomon/log"
-	"github.com/hongweikkx/rashomon/router"
-	"github.com/hongweikkx/rashomon/service"
+	"rashomon/cmd"
+	"rashomon/conf"
+	"rashomon/pkg/logger"
+	"rashomon/pkg/mysql"
+	"rashomon/pkg/redis"
 )
 
 func main() {
-	if conf.AppConfig.Prod {
-		gin.SetMode(gin.ReleaseMode)
+	// 应用的主入口，默认调用 cmd.CmdServe 命令
+	var rootCmd = &cobra.Command{
+		Use:   "rashomon",
+		Short: `use "-h" flag to see all subcommands`,
+		Long:  `use "-h" flag to see all subcommands`,
+
+		// rootCmd 的所有子命令都会执行以下代码
+		PersistentPreRun: func(command *cobra.Command, args []string) {
+			conf.Init()
+			logger.Init()
+			redis.Init()
+			mysql.Init()
+		},
+		PersistentPostRun: func(cmd *cobra.Command, args []string) {
+			logger.Quit()
+		},
 	}
-	engine := gin.New()
-	router.Router(engine)
-	serv := &http.Server{
-		Addr:    conf.AppConfig.Addr,
-		Handler: engine,
+	// 注册子命令,用于有一些命令需要编写时候
+	rootCmd.AddCommand(
+		cmd.WebServer,
+	)
+
+	// 执行主命令
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Printf("Failed to run app with %v: %s\n", os.Args, err.Error())
 	}
-	go func() {
-		if err := serv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Logger.Fatal("http serv err:", err.Error())
-		}
-	}()
-	log.Logger.Infof("server started on %+v...", conf.AppConfig.Addr)
-	// wait to stop
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
-	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := serv.Shutdown(ctx); err != nil {
-		log.Logger.Info("[dasboard] http server forced to shutdown:", err)
-	}
-	service.MonitorNewRelic.Shutdown(time.Second)
-	log.Logger.Sync()
-	log.Logger.Info("server exit.")
 }

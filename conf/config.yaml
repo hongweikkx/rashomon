@@ -1,6 +1,34 @@
-Prod: false
-Addr: ":8000"
-RedisHost: "localhost:6379"
+service:
+  AppMode: debug
+  AppName: rashomon
+  HttpPort: :5690
 
+http:
+  ReadTimeout: 60
+  WriteTimeout: 60
+  MaxHeaderBytes: 20
 
+log:
+  Level: debug
+  Type: daily
+  Filename: "logs/logs.logger"
+  MaxSize: 64
+  MaxBackup: 5
+  MaxAge: 30
+  Compress: false
+
+mysql:
+  Db: "mysql"
+  DbHost: "localhost"
+  DbPort: "3306"
+  DbUser: "root"
+  DbPassWord: "Rsrzrcj123"
+  DbName: "rashomon"
+
+redis:
+  RedisDb: redis
+  RedisAddr: "127.0.0.1:6379"
+  RedisPw:
+  RedisDbName: 0
+  RedisWarnTime: 3000
 

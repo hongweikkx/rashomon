@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"rashomon/middleware/ctxkv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hongweikkx/rashomon/router/middleware/ctxkv"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -73,7 +73,6 @@ func RecoveryWithLog(c *gin.Context) {
 				c.Abort()
 				return
 			}
-
 			logger.Error("[RECOVER FROM PANIC]",
 				zap.Any("error", err),
 				zap.String("time", time.Now().Format(time.RFC3339)),

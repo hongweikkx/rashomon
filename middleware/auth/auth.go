@@ -1,4 +1,4 @@
-package modAuth
+package auth
 
 import (
 	"fmt"
@@ -9,19 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AuthIns auth
-
-type auth struct {
-	*jwt.GinJWTMiddleware
-}
+var Auth *jwt.GinJWTMiddleware
 
 func init() {
-	AuthMiddleWare, err := New()
+	var err error
+	Auth, err = New()
 	if err != nil {
 		panic(fmt.Sprintf("dashboard auth middle err:%+v", err))
-	}
-	AuthIns = auth{
-		AuthMiddleWare,
 	}
 }
 
@@ -118,6 +112,6 @@ func logoutResponse(c *gin.Context, code int) {
 	})
 }
 
-func (auth auth) UserAuthInfo(c *gin.Context) *User {
-	return auth.GinJWTMiddleware.IdentityHandler(c).(*User)
+func UserAuthInfo(c *gin.Context) *User {
+	return Auth.IdentityHandler(c).(*User)
 }
