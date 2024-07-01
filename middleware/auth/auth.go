@@ -44,8 +44,8 @@ func New() (*jwt.GinJWTMiddleware, error) {
 			if v, ok := data.(*model.User); ok {
 				return jwt.MapClaims{
 					identityKey: &User{
-						Id: v.ID,
-						Name: v.Name
+						Id:   v.ID,
+						Name: v.Name,
 					},
 				}
 			}
