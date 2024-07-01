@@ -29,6 +29,5 @@ func Router(engine *gin.Engine) {
 	v1.POST("login", rate.LimitDefault(), auth.Auth.LoginHandler)
 	authG.POST("logout", rate.LimitDefault(), auth.Auth.LogoutHandler)
 	authG.POST("refresh_token", rate.LimitDefault(), auth.Auth.RefreshHandler)
-	authG.GET("info", rate.LimitDefault(), handle.UserInfo)
-
+	authG.GET("user", rate.LimitDefault(), handle.UserInfo)
 }

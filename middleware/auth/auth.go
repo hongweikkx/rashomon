@@ -2,7 +2,10 @@ package auth
 
 import (
 	"fmt"
-	"net/http"
+	"rashomon/api/response"
+	"rashomon/model"
+	"rashomon/pkg/hash"
+	"rashomon/service/user"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -25,11 +28,12 @@ type login struct {
 }
 
 type User struct {
-	Id string
+	Id   uint64
+	Name string
 }
 
 func New() (*jwt.GinJWTMiddleware, error) {
-	identityKey := "id"
+	identityKey := "user"
 	authMiddleWare, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "name",
 		Key:         []byte("secret key"),
@@ -37,25 +41,28 @@ func New() (*jwt.GinJWTMiddleware, error) {
 		MaxRefresh:  time.Minute * 10,
 		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*User); ok {
+			if v, ok := data.(*model.User); ok {
 				return jwt.MapClaims{
-					identityKey: v.Id,
+					identityKey: &User{
+						Id: v.ID,
+						Name: v.Name
+					},
 				}
 			}
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			calims := jwt.ExtractClaims(c)
-			return &User{
-				Id: calims[identityKey].(string),
+			userInfo := &User{}
+			if userIdentity, ok := calims[identityKey].(*model.User); ok {
+				userInfo.Id = userIdentity.ID
+				userInfo.Name = userIdentity.Name
 			}
+			return userInfo
 		},
 		Authenticator: authenticator,
 		Unauthorized: func(c *gin.Context, code int, message string) {
-			c.JSON(http.StatusOK, gin.H{
-				"code":    40100,
-				"message": message,
-			})
+			response.Error(c, code, message)
 		},
 		LoginResponse:   loginResponse,
 		LogoutResponse:  logoutResponse,
@@ -81,37 +88,32 @@ func New() (*jwt.GinJWTMiddleware, error) {
 }
 
 func authenticator(c *gin.Context) (interface{}, error) {
-	var loginVals login
-	if err := c.ShouldBind(&loginVals); err != nil {
+	loginVal := login{}
+	if err := c.ShouldBind(&loginVal); err != nil {
 		return "", jwt.ErrMissingLoginValues
 	}
-	userName := loginVals.Username
-	password := loginVals.Password
-	if userName == "admin" && password == "123456" {
-		return &User{
-			Id: "100000",
-		}, nil
+	userInfo, err := user.NewUserService().GetUserByName(c, loginVal.Username)
+	if err != nil {
+		return "", err
 	}
-	return nil, jwt.ErrFailedAuthentication
+	if !hash.BcryptCheck(loginVal.Password, userInfo.Password) {
+		return nil, jwt.ErrFailedAuthentication
+	}
+	return userInfo, nil
 }
 
 func loginResponse(c *gin.Context, code int, token string, expire time.Time) {
-	c.JSON(http.StatusOK, gin.H{
-		"code": 20000,
-		"data": gin.H{
-			"token":   token,
-			"expires": expire.Format(time.RFC3339),
-		},
-	})
+	data := map[string]interface{}{
+		"token":   token,
+		"expires": expire.Format(time.RFC3339),
+	}
+	response.Success(c, data)
 }
 
 func logoutResponse(c *gin.Context, code int) {
-	c.JSON(http.StatusOK, gin.H{
-		"code": 20000,
-		"data": "success",
-	})
+	response.Success(c, "success")
 }
 
-func UserAuthInfo(c *gin.Context) *User {
+func GetUserAuthInfo(c *gin.Context) *User {
 	return Auth.IdentityHandler(c).(*User)
 }
