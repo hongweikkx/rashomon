@@ -6,6 +6,7 @@ import (
 	"net/http/httputil"
 	"os"
 	"rashomon/middleware/ctxkv"
+	"rashomon/pkg/logger"
 	"strings"
 	"time"
 
@@ -20,7 +21,6 @@ func LogMiddle(c *gin.Context) {
 	path := c.Request.URL.Path
 	query := c.Request.URL.RawQuery
 	c.Next()
-	logger := ctxkv.Log(c)
 	end := time.Now()
 	latency := end.Sub(start)
 	end = end.UTC()
@@ -28,7 +28,7 @@ func LogMiddle(c *gin.Context) {
 	if len(c.Errors) > 0 {
 		// Append error field if this is an erroneous request.
 		for _, e := range c.Errors.Errors() {
-			logger.Error(e)
+			logger.Error(c, e)
 		}
 	} else {
 		fields := []zapcore.Field{
@@ -39,17 +39,15 @@ func LogMiddle(c *gin.Context) {
 			zap.String("ip", c.ClientIP()),
 			zap.String("user-agent", c.Request.UserAgent()),
 			zap.Duration("latency", latency),
-			zap.String("time", end.Format(time.RFC3339)),
 		}
 		if ctxkv.GetDgd(c) {
 			fields = append(fields, zap.Bool("degrade", true))
 		}
-		logger.Info(path, fields...)
+		logger.Info(c, path, fields...)
 	}
 }
 
 func RecoveryWithLog(c *gin.Context) {
-	logger := ctxkv.Log(c)
 	defer func() {
 		if err := recover(); err != nil {
 			// Check for a broken connection, as it is not really a
@@ -64,7 +62,7 @@ func RecoveryWithLog(c *gin.Context) {
 			}
 			httpRequest, _ := httputil.DumpRequest(c.Request, false)
 			if brokenPipe {
-				logger.Error(c.Request.URL.Path,
+				logger.Error(c, c.Request.URL.Path,
 					zap.Any("error", err),
 					zap.String("request", string(httpRequest)),
 				)
@@ -73,7 +71,7 @@ func RecoveryWithLog(c *gin.Context) {
 				c.Abort()
 				return
 			}
-			logger.Error("[RECOVER FROM PANIC]",
+			logger.Error(c, "[RECOVER FROM PANIC]",
 				zap.Any("error", err),
 				zap.String("time", time.Now().Format(time.RFC3339)),
 			)

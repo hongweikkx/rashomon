@@ -23,11 +23,10 @@ func Router(engine *gin.Engine) {
 	engine.GET("/", response.Health)
 	engine.GET("/health", response.Health)
 
-	v1 := engine.Group("v1")
-	authG := v1.Group("/")
+	authG := engine.Group("/")
 	authG.Use(auth.Auth.MiddlewareFunc())
-	v1.POST("login", rate.LimitDefault(), auth.Auth.LoginHandler)
-	authG.POST("logout", rate.LimitDefault(), auth.Auth.LogoutHandler)
-	authG.POST("refresh_token", rate.LimitDefault(), auth.Auth.RefreshHandler)
-	authG.GET("user", rate.LimitDefault(), handle.UserInfo)
+	engine.POST("user/login", rate.LimitDefault(), auth.Auth.LoginHandler)
+	authG.POST("user/logout", rate.LimitDefault(), auth.Auth.LogoutHandler)
+	authG.POST("user/refresh_token", rate.LimitDefault(), auth.Auth.RefreshHandler)
+	authG.GET("user/info", rate.LimitDefault(), handle.UserInfo)
 }

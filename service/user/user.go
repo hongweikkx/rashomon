@@ -44,12 +44,12 @@ func (us UserService) GetUserByName(c context.Context, userName string) (*model.
 func (us UserService) CacheUser(c context.Context, user *model.User) {
 	marshalUser, err := json.Marshal(*user)
 	if err != nil {
-		logger.Logger.Error("cache user", zap.Error(err))
+		logger.Error(c, "cache user", zap.Error(err))
 		return
 	}
 	_, err = redisDB.Redis.Set(c, user.Name, string(marshalUser), time.Minute)
 	if err != nil {
-		logger.Logger.Error("cache user", zap.Error(err))
+		logger.Error(c, "cache user", zap.Error(err))
 	}
 	return
 }

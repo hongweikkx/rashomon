@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"rashomon/consts"
 	"rashomon/middleware/ctxkv"
+	"rashomon/pkg/logger"
 	"time"
 
 	"github.com/afex/hystrix-go/hystrix"
@@ -34,7 +35,6 @@ func Fuse(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx context.
 }
 
 func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx context.Context) (int, interface{}), degradeF func() (int, interface{})) {
-	logger := ctxkv.Log(c)
 	if conf != nil {
 		hystrix.ConfigureCommand(dgdName(c), *conf)
 	}
@@ -47,7 +47,7 @@ func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx conte
 		err := hystrix.DoC(ctx, dgdName(c), func(ctx context.Context) error {
 			defer func() {
 				if e := recover(); e != nil {
-					logger.Error("[RECOVER FROM PANIC] ",
+					logger.Error(c, "[RECOVER FROM PANIC] ",
 						zap.Any("error", e),
 						zap.String("time", time.Now().Format(time.RFC3339)),
 					)

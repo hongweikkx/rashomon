@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `zyy_es_users` (
+CREATE TABLE IF NOT EXISTS `users` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '姓名',
     `phone` char(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '手机号码',

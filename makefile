@@ -12,7 +12,7 @@ build:
 
 ## run: run the app
 run: build
-	./bin/${APPNAME}
+	./bin/${APPNAME} server
 
 ## stop : stop the app
 stop: 

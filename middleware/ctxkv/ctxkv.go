@@ -3,8 +3,7 @@ package ctxkv
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"go.uber.org/zap"
-	"rashomon/pkg/logger"
+	"rashomon/consts"
 )
 
 type CtxKV struct {
@@ -12,30 +11,16 @@ type CtxKV struct {
 }
 
 const CTX_INFO = "info"
-const CTX_LOG = "logger"
 const CTX_DEGRADE = "degrade"
 
 func Bind(c *gin.Context) {
+	traceId := uuid.New().String()
 	ctx := &CtxKV{}
 	ctx.PlatForm = c.GetHeader("x-platform")
 	c.Set(CTX_INFO, ctx)
-	c.Set(CTX_LOG, logger.Logger.With(zap.String("trace-id", uuid.New().String())))
+	c.Set(consts.TRACE_ID, traceId)
 	SetDgd(c, false)
 	c.Next()
-}
-
-func GetInfo(c *gin.Context) *CtxKV {
-	if value, isExist := c.Get(CTX_INFO); isExist {
-		return value.(*CtxKV)
-	}
-	return &CtxKV{}
-}
-
-func Log(c *gin.Context) *zap.Logger {
-	if value, isExist := c.Get(CTX_LOG); isExist {
-		return value.(*zap.Logger)
-	}
-	return logger.Logger
 }
 
 func SetDgd(c *gin.Context, dgd bool) {

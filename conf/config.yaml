@@ -1,7 +1,7 @@
 service:
   AppMode: debug
   AppName: rashomon
-  HttpPort: :5690
+  HttpPort: :5692
 
 http:
   ReadTimeout: 60
@@ -30,5 +30,5 @@ redis:
   RedisAddr: "127.0.0.1:6379"
   RedisPw:
   RedisDbName: 0
-  RedisWarnTime: 3000
+  RedisWarnTime: 0
 

@@ -42,10 +42,10 @@ func runWebServer(cmd *cobra.Command, args []string) {
 
 	go func() {
 		if err := serv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) && err != nil {
-			logger.Logger.Fatal("http serv err:", zap.Error(err))
+			logger.Fatal(context.Background(), "http serv err:", zap.Error(err))
 		}
 	}()
-	logger.Logger.Info("server started on ...", zap.Any("addr", conf.AppConfig.Service.HttpPort))
+	logger.Info(context.Background(), "server started on ...", zap.Any("addr", conf.AppConfig.Service.HttpPort))
 	// wait to stop
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
@@ -54,16 +54,16 @@ func runWebServer(cmd *cobra.Command, args []string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := serv.Shutdown(ctx); err != nil {
-		logger.Logger.Error("http server forced to shutdown:", zap.Error(err))
+		logger.Error(ctx, "http server forced to shutdown:", zap.Error(err))
 	}
-	logger.Logger.Info("server exit.")
+	logger.Info(context.Background(), "server exit.")
 }
 
 // 加载全局中间件
 //func registerGlobalMiddleWare(router *gin.Engine) {
 //	router.Use(
 //		common.Recovery(),
-//		common.Logger(),
+//		common._Logger(),
 //	)
 //	store := cookie.NewStore([]byte(conf.CookieSecret))
 //	router.Use(common.Cors())
