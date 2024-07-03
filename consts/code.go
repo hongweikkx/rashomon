@@ -5,8 +5,8 @@ const (
 )
 
 const (
-	Success               = 200
-	InvalidParams         = 400
+	Success               = 20000
+	InvalidParams         = 40000
 	Forbidden             = 403
 	NotFound              = 404
 	StatusTooManyRequests = 429

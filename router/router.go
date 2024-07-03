@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"rashomon/api/response"
 	"rashomon/middleware/auth"
+	"rashomon/middleware/cors"
 	"rashomon/middleware/ctxkv"
 	"rashomon/middleware/mlog"
 	"rashomon/middleware/rate"
@@ -14,6 +15,7 @@ import (
 func Router(engine *gin.Engine) {
 	engine.Use(
 		ctxkv.Bind,
+		cors.Cors(),
 		mlog.LogMiddle,
 		mlog.RecoveryWithLog,
 		gzip.Gzip(gzip.DefaultCompression),

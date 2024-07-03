@@ -1,7 +1,7 @@
 service:
   AppMode: debug
   AppName: rashomon
-  HttpPort: :5692
+  HttpPort: localhost:6592
 
 http:
   ReadTimeout: 60

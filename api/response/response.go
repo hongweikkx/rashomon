@@ -12,7 +12,7 @@ func NoRoute(c *gin.Context) {
 }
 
 func Health(c *gin.Context) {
-	Success(c, "ok")
+	Abort404(c)
 }
 
 func Success(c *gin.Context, data interface{}, msg ...string) {
@@ -23,21 +23,17 @@ func Success(c *gin.Context, data interface{}, msg ...string) {
 	})
 }
 
-// BadRequest 响应 400
-func BadRequest(c *gin.Context, err error, msg ...string) {
-	c.AbortWithStatusJSON(http.StatusOK, Response{
-		Code:  consts.InvalidParams,
-		Msg:   strings.Join(msg, ";"),
-		Error: err.Error(),
-	})
-}
-
 // Error 响应
 func Error(c *gin.Context, code int, msg ...string) {
-	c.JSON(http.StatusOK, Response{
+	c.JSON(http.StatusInternalServerError, Response{
 		Code: code,
 		Msg:  strings.Join(msg, ";"),
 	})
+}
+
+// BadRequest 响应 400
+func BadRequest(c *gin.Context, err error, msg ...string) {
+	c.AbortWithStatusJSON(http.StatusBadRequest, Response{Msg: strings.Join(msg, ";"), Error: err.Error()})
 }
 
 func Abort404(c *gin.Context) {
@@ -50,4 +46,8 @@ func Abort403(c *gin.Context) {
 
 func Abort500(c *gin.Context, msg ...string) {
 	c.AbortWithStatusJSON(http.StatusInternalServerError, Response{})
+}
+
+func AbortStatusAccepted(c *gin.Context, msg ...string) {
+	c.AbortWithStatus(http.StatusAccepted)
 }
