@@ -27,13 +27,17 @@ type login struct {
 	Password string `form:"password" json:"password" binding:"required"`
 }
 
-type User struct {
-	Id   uint64
-	Name string
+func MiddleWare(authMiddleware *jwt.GinJWTMiddleware) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		errInit := authMiddleware.MiddlewareInit()
+		if errInit != nil {
+			panic("authMiddleware.MiddlewareInit() Error:" + errInit.Error())
+		}
+	}
 }
 
 func New() (*jwt.GinJWTMiddleware, error) {
-	identityKey := "user"
+	identityKey := "id"
 	authMiddleWare, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "name",
 		Key:         []byte("secret key"),
@@ -43,22 +47,16 @@ func New() (*jwt.GinJWTMiddleware, error) {
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*model.User); ok {
 				return jwt.MapClaims{
-					identityKey: &User{
-						Id:   v.ID,
-						Name: v.Name,
-					},
+					identityKey: v.Name,
 				}
 			}
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
-			calims := jwt.ExtractClaims(c)
-			userInfo := &User{}
-			if userIdentity, ok := calims[identityKey].(*model.User); ok {
-				userInfo.Id = userIdentity.ID
-				userInfo.Name = userIdentity.Name
+			claims := jwt.ExtractClaims(c)
+			return &model.User{
+				Name: claims[identityKey].(string),
 			}
-			return userInfo
 		},
 		Authenticator: authenticator,
 		Unauthorized: func(c *gin.Context, code int, message string) {
@@ -114,6 +112,6 @@ func logoutResponse(c *gin.Context, code int) {
 	response.Success(c, "success")
 }
 
-func GetUserAuthInfo(c *gin.Context) *User {
-	return Auth.IdentityHandler(c).(*User)
+func GetUserAuthInfo(c *gin.Context) *model.User {
+	return Auth.IdentityHandler(c).(*model.User)
 }

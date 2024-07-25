@@ -35,6 +35,15 @@ type HttpConf struct {
 	MaxHeaderBytes uint  `yaml:"MaxHeaderBytes"`
 }
 
+type OSS struct {
+	EndPoint        string `yaml:"EndPoint"`
+	AccessKeyId     string `yaml:"AccessKeyId"`
+	AccessKeySecret string `yaml:"AccessKeySecret"`
+	SecurityToken   string `yaml:"SecurityToken"`
+	Bucket          string `yaml:"Bucket"`
+	Address         string `yaml:"Address"`
+}
+
 type LogConf struct {
 	Level      string `json:"level"`       // Level 最低日志等级，DEBUG<INFO<WARN<ERROR<FATAL 例如：info-->收集info等级以上的日志
 	FileName   string `json:"file_name"`   // FileName 日志文件位置
@@ -49,6 +58,7 @@ type Config struct {
 	Redis   RedisConf   `yaml:"redis"`
 	Http    HttpConf    `yaml:"http"`
 	Log     LogConf     `yaml:"logger"`
+	Oss     OSS         `yaml:"OSS"`
 }
 
 // Init init config

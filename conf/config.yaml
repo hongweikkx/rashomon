@@ -32,3 +32,11 @@ redis:
   RedisDbName: 0
   RedisWarnTime: 0
 
+OSS:
+  EndPoint: ""
+  AccessKeyId: ""
+  AccessKeySecret: ""
+  SecurityToken: ""
+  Bucket: ""
+  Address: ""
+

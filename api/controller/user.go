@@ -1,4 +1,4 @@
-package handle
+package controller
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,13 @@ import (
 	userService "rashomon/service/user"
 )
 
-func UserInfo(c *gin.Context) {
+type UserController struct{}
+
+func NewUserController() *UserController {
+	return &UserController{}
+}
+
+func (userC UserController) UserInfo(c *gin.Context) {
 	user := auth.GetUserAuthInfo(c)
 	userInfo, err := userService.NewUserService().GetUserByName(c, user.Name)
 	if err != nil {

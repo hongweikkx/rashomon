@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"rashomon/middleware/ctxkv"
 	"rashomon/pkg/logger"
 	"strings"
 	"time"
@@ -39,9 +38,6 @@ func LogMiddle(c *gin.Context) {
 			zap.String("ip", c.ClientIP()),
 			zap.String("user-agent", c.Request.UserAgent()),
 			zap.Duration("latency", latency),
-		}
-		if ctxkv.GetDgd(c) {
-			fields = append(fields, zap.Bool("degrade", true))
 		}
 		logger.Info(c, path, fields...)
 	}

@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS `users` (
     `created_at` timestamp NULL DEFAULT NULL COMMENT '创建时间',
     `updated_at` timestamp NULL DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `phone_unique` (`phone`)
+    UNIQUE KEY `phone_unique` (`phone`),
+    UNIQUE KEY `phone_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';

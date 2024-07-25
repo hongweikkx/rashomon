@@ -18,14 +18,9 @@ run: build
 stop: 
 	@kill -15 ${PID}
 
-
 ## test: test the app
 test:
 	go test -cover ./...
-
-## vendor: go mod vendor
-vendor:
-	go mod vendor
 
 help: Makefile
 	@echo

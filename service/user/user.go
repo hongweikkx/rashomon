@@ -14,13 +14,13 @@ import (
 	"time"
 )
 
-type UserService struct{}
+type Service struct{}
 
-func NewUserService() UserService {
-	return UserService{}
+func NewUserService() Service {
+	return Service{}
 }
 
-func (us UserService) GetUserByName(c context.Context, userName string) (*model.User, error) {
+func (us Service) GetUserByName(c context.Context, userName string) (*model.User, error) {
 	userRedis, err := redisDB.Redis.Get(c, userName)
 	if errors.Is(err, redis.Nil) {
 		userDb, err := dao.NewUserDao(c).GetUserByName(userName)
@@ -41,7 +41,7 @@ func (us UserService) GetUserByName(c context.Context, userName string) (*model.
 	return &user, err
 }
 
-func (us UserService) CacheUser(c context.Context, user *model.User) {
+func (us Service) CacheUser(c context.Context, user *model.User) {
 	marshalUser, err := json.Marshal(*user)
 	if err != nil {
 		logger.Error(c, "cache user", zap.Error(err))

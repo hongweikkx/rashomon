@@ -3,21 +3,19 @@ package router
 import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"rashomon/api/controller"
 	"rashomon/api/response"
 	"rashomon/middleware/auth"
-	"rashomon/middleware/cors"
 	"rashomon/middleware/ctxkv"
 	"rashomon/middleware/mlog"
-	"rashomon/middleware/rate"
-	"rashomon/router/handle"
 )
 
 func Router(engine *gin.Engine) {
 	engine.Use(
 		ctxkv.Bind,
-		cors.Cors(),
 		mlog.LogMiddle,
 		mlog.RecoveryWithLog,
+		auth.MiddleWare(auth.Auth),
 		gzip.Gzip(gzip.DefaultCompression),
 	)
 
@@ -27,8 +25,9 @@ func Router(engine *gin.Engine) {
 
 	authG := engine.Group("/")
 	authG.Use(auth.Auth.MiddlewareFunc())
-	engine.POST("user/login", rate.LimitDefault(), auth.Auth.LoginHandler)
-	authG.POST("user/logout", rate.LimitDefault(), auth.Auth.LogoutHandler)
-	authG.POST("user/refresh_token", rate.LimitDefault(), auth.Auth.RefreshHandler)
-	authG.GET("user/info", rate.LimitDefault(), handle.UserInfo)
+	engine.POST("user/login", auth.Auth.LoginHandler)
+	authG.POST("user/logout", auth.Auth.LogoutHandler)
+	authG.POST("user/refresh_token", auth.Auth.RefreshHandler)
+	userC := controller.NewUserController()
+	authG.GET("user/info", userC.UserInfo)
 }

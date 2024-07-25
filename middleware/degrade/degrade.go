@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"rashomon/consts"
-	"rashomon/middleware/ctxkv"
 	"rashomon/pkg/logger"
 	"time"
 
@@ -64,11 +63,10 @@ func Degrade(c *gin.Context, conf *hystrix.CommandConfig, actionF func(ctx conte
 	}()
 	done := <-doneCh
 	if !done {
-		ctxkv.SetDgd(c, true)
 		status, res = degradeF()
 	}
-	if ress, ok := res.(string); ok {
-		c.String(status, ress)
+	if resStr, ok := res.(string); ok {
+		c.String(status, resStr)
 	} else {
 		c.JSON(status, res)
 	}
